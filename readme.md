@@ -66,8 +66,3 @@ For any queries, issues, or feedback, please reach out to our support team at [s
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-```
-
-Feel free to customize and embellish the README with your application's specific details, instructions, and additional sections as needed.
-```
