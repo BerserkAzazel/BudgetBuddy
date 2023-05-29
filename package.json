@@ -1,0 +1,30 @@
+{
+  "name": "budgetbuddy",
+  "version": "1.0.0",
+  "description": "Finance tracker application that incorporates multifactor authentication with FIDO2, categorizes transactions in expense, savings, investment, or earning, and allows users to make investments",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rishitashaw/BudgetBuddy.git"
+  },
+  "keywords": [
+    "FIDO2",
+    "Finance",
+    "Tracker",
+    "Budget"
+  ],
+  "author": "Rishita Shaw",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rishitashaw/BudgetBuddy/issues"
+  },
+  "homepage": "https://github.com/rishitashaw/BudgetBuddy#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.22"
+  }
+}
