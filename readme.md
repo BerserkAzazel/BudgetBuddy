@@ -1,6 +1,6 @@
 # BudgetBuddy - Your Comprehensive Finance Tracker
 
-![BudgetBuddy Logo](path_to_logo.png) <!-- Replace "path_to_logo.png" with the actual path to your logo image -->
+![BudgetBuddy Logo](https://github.com/rishitashaw/BudgetBuddy/assets/75828535/c447d8d5-95c9-47ad-822e-9cc40d87bf31)
 
 Welcome to BudgetBuddy, the all-in-one finance tracker application that helps you effortlessly manage your expenses, savings, investments, and earnings. With built-in multifactor authentication using FIDO2, your financial data remains secure and protected.
 
