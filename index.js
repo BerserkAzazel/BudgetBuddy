@@ -3,6 +3,7 @@ const path = require('path');
 const dotenv = require("dotenv");
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 
 const connectDB = require("./config/db");
 
