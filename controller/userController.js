@@ -78,7 +78,7 @@ const verifyUserAuthentication = async (authentication) => {
 
         const userCredentialKey = await findCredentialKeyById(authentication.credentialId); // Retrieve credential key from the database
 
-        const result = await server.verifyAssertion(authentication, userCredentialKey.registrationData.credential, verificationOptions);
+        const result = await server.verifyAssertion(authentication, userCredentialKey, verificationOptions);
 
         // Verification successful
         if (result.verified) {
@@ -97,9 +97,10 @@ const verifyUserAuthentication = async (authentication) => {
 
 const findCredentialKeyById = async (credentialId) => {
     try {
-        const user = await User.findOne({ credentialKeys: credentialId });
+        const user = await User.find({ credentialKeys: { "$all": [credentialId] } });
         if (user) {
-            return user;
+            console.log(user.registrationData.credential)
+            return user.registrationData.credential;
         } else {
             throw new Error('User not found');
         }

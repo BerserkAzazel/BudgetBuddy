@@ -20,7 +20,7 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const registration = await client.register(this.username, challenge, {
-          authenticatorType: 'platform',
+          authenticatorType: 'cross-platform',
           userVerification: 'required',
           timeout: 60000,
           attestation: 'none',
@@ -43,6 +43,7 @@ const app = new Vue({
         if (response.ok) {
           this.isRegistered = true;
           this.isAuthenticated = true;
+          this.registrationData = parsers.parseRegistration(registrationData)
         } else {
           console.error('Registration failed:', response.statusText);
         }
@@ -62,6 +63,9 @@ const app = new Vue({
       });
 
       if (response.ok) {
+        this.isRegistered = true;
+        this.isAuthenticated = true;
+        this.registrationData = parsers.parseRegistration(registrationData)
         return response.json();
       } else {
         console.error('Registration verification failed:', response.statusText);
@@ -77,7 +81,7 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const authentication = await client.authenticate([], challenge, {
-          authenticatorType: 'platform',
+          authenticatorType: 'cross-platform',
           userVerification: 'required',
           timeout: 60000,
           debug: false,
@@ -97,6 +101,8 @@ const app = new Vue({
 
         if (response.ok) {
           this.isAuthenticated = true;
+          this.authenticationData = parser.parseAuthentication(authenticationData)
+
         } else {
           console.error('Authentication failed:', response.statusText);
           this.isAuthenticated = false;
@@ -113,11 +119,14 @@ const app = new Vue({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          username,
           authentication,
         }),
       });
 
       if (response.ok) {
+        this.isAuthenticated = true;
+        this.authenticationData = parser.parseAuthentication(authenticationData)
         return response.json();
       } else {
         console.error('Authentication verification failed:', response.statusText);
@@ -128,6 +137,8 @@ const app = new Vue({
       const response = await fetch('/api/logout', { method: 'POST' });
       if (response.ok) {
         this.isAuthenticated = false;
+        this.authenticationData = null
+        this.registrationData = null
       } else {
         console.error('Logout failed:', response.statusText);
       }
