@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
     {
@@ -15,30 +14,13 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
-        credentialId: {
-            type: String,
-            required: true,
-        },
-        signature: {
-            type: String,
-            required: true,
-        }
+        registrationData: { type: mongoose.Schema.Types.Mixed },
+        credentialKeys: [{ type: String }],
     },
     { timestaps: true }
 );
 
-userSchema.methods.matchCredentials = async function (eneteredCredentials) {
-    return await bcrypt.compare(eneteredCredentials, this.credentialId);
-};
-
-userSchema.pre("save", async function (next) {
-    if (!this.isModified) {
-        next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.credentialId = await bcrypt.hash(this.credentialId, salt);
-});
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;
+export default User;

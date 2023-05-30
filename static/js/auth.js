@@ -1,4 +1,4 @@
-import { client, parsers } from './webauthn.min.js'
+import { client, parsers } from './webauthn.min.js';
 
 const app = new Vue({
   el: '#app',
@@ -8,56 +8,132 @@ const app = new Vue({
     isAuthenticated: false,
     isRoaming: false,
     registrationData: null,
-    authenticationData: null
+    authenticationData: null,
   },
   methods: {
     async checkIsRegistered() {
-      console.log(this.username + ' => ' + !!window.localStorage.getItem(this.username))
-      this.isRegistered = !!window.localStorage.getItem(this.username)
+      const response = await fetch('/api/checkIsRegistered');
+      const { isRegistered } = await response.json();
+      this.isRegistered = isRegistered;
     },
     async register() {
-      let res = await client.register(this.username, window.crypto.randomUUID(), { authType: this.isRoaming ? 'roaming' : 'auto' })
-      console.debug(res)
+      try {
+        const challenge = await this.requestChallenge();
+        const registration = await client.register(this.username, challenge, {
+          authenticatorType: 'platform',
+          userVerification: 'required',
+          timeout: 60000,
+          attestation: 'none',
+          debug: false,
+        });
 
-      const parsed = parsers.parseRegistration(res)
-      console.log(parsed)
+        const registrationData = await this.verifyRegistration(registration);
 
-      window.localStorage.setItem(this.username, parsed.credential.id)
-      this.isAuthenticated = true
-      this.registrationData = parsed
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: this.username,
+            registrationData,
+          }),
+        });
 
-      this.$buefy.toast.open({
-        message: 'Registered!',
-        type: 'is-success'
-      })
+        if (response.ok) {
+          this.isRegistered = true;
+          this.isAuthenticated = true;
+        } else {
+          console.error('Registration failed:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Registration failed:', error);
+      }
+    },
+    async verifyRegistration(registration) {
+      const response = await fetch('/api/verifyRegistration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          registration,
+        }),
+      });
 
-      await this.checkIsRegistered()
+      if (response.ok) {
+        return response.json();
+      } else {
+        console.error('Registration verification failed:', response.statusText);
+        throw new Error('Registration verification failed');
+      }
+    },
+    async requestChallenge() {
+      const response = await fetch('/api/getChallenge');
+      const { challenge } = await response.json();
+      return challenge;
     },
     async login() {
-      let credentialId = window.localStorage.getItem(this.username)
-      let res = await client.authenticate(credentialId ? [credentialId] : [], window.crypto.randomUUID(), { authType: this.isRoaming ? 'roaming' : 'auto' })
-      console.debug(res)
+      try {
+        const challenge = await this.requestChallenge();
+        const authentication = await client.authenticate([], challenge, {
+          authenticatorType: 'platform',
+          userVerification: 'required',
+          timeout: 60000,
+          debug: false,
+        });
 
-      const parsed = parsers.parseAuthentication(res)
-      console.log(parsed)
+        const authenticationData = await this.verifyAuthentication(authentication);
 
-      this.isAuthenticated = true
-      this.authenticationData = parsed
+        const response = await fetch('/api/verifyAuthentication', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            authenticationData,
+          }),
+        });
 
-      this.$buefy.toast.open({
-        message: 'Signed in!',
-        type: 'is-success'
-      })
+        if (response.ok) {
+          this.isAuthenticated = true;
+        } else {
+          console.error('Authentication failed:', response.statusText);
+          this.isAuthenticated = false;
+        }
+      } catch (error) {
+        console.error('Authentication failed:', error);
+        this.isAuthenticated = false;
+      }
+    },
+    async verifyAuthentication(authentication) {
+      const response = await fetch('/api/verifyAuthentication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          authentication,
+        }),
+      });
+
+      if (response.ok) {
+        return response.json();
+      } else {
+        console.error('Authentication verification failed:', response.statusText);
+        throw new Error('Authentication verification failed');
+      }
     },
     async logout() {
-      this.isAuthenticated = false;
-      this.$buefy.toast.open({
-        message: 'Signed out!',
-        type: 'is-success'
-      })
-      this.authenticationData = null
-      this.registrationData = null
-    }
-  }
-})
-
+      const response = await fetch('/api/logout', { method: 'POST' });
+      if (response.ok) {
+        this.isAuthenticated = false;
+      } else {
+        console.error('Logout failed:', response.statusText);
+      }
+    },
+  },
+  async mounted() {
+    await this.checkIsRegistered();
+  },
+});
