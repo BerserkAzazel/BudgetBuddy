@@ -1,5 +1,5 @@
 import express from 'express';
-import { getChallenge, checkIsRegistered, registerNewUsers, register, verifyRegistrationPayload, verifyUserAuthentication, logoutUser } from '../controller/userController.js';
+import { getChallenge, getUserInfo, checkIsRegistered, registerNewUsers, register, verifyRegistrationPayload, verifyUserAuthentication, logoutUser } from '../controller/userController.js';
 
 const userRoutes = express.Router();
 
@@ -24,5 +24,7 @@ userRoutes.post('/verifyAuthentication', verifyUserAuthentication);
 // Logging out user
 userRoutes.post('/logout', logoutUser);
 
+// Get User Info
+userRoutes.post('/info', getUserInfo);
 
 export { userRoutes };

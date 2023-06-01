@@ -113,6 +113,7 @@ const app = new Vue({
           this.username = this.newusername
           // window.localStorage.setItem(this.registrationData, verifyRegistrationData)
 
+
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
@@ -187,6 +188,7 @@ const app = new Vue({
             message: 'Signed In!',
             type: 'is-success'
           })
+
           // window.localStorage.setItem(this.authenticationData, authentication)
         } else {
           // Authentication failed
@@ -201,14 +203,27 @@ const app = new Vue({
       } catch (error) {
         //  // console.error('Error during authentication:', error);
         this.isAuthenticated = false;
-
         this.$buefy.toast.open({
           message: `Authentication failed: ${ error.message }`,
           type: 'is-danger'
         })
       }
     },
-
+    async getUserInfo(credentialId) {
+      const response = await fetch('/api/info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          credentialId
+        }),
+      });
+      if (response.ok) {
+        const user = await response.json();
+        return user;
+      } else {
+        console.error(response.statusText)
+      }
+    },
     async logout() {
       this.isAuthenticated = false;
       this.authenticationData = null
@@ -225,9 +240,7 @@ const app = new Vue({
       // }
     },
   },
-  async mounted() {
-    this.isRegistered = !!window.localStorage.getItem(this.username)
 
-    await this.checkIsRegistered();
+  async mounted() {
   },
 });

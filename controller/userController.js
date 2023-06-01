@@ -31,6 +31,20 @@ const checkIsRegistered = asyncHandler(async (req, res) => {
     }
 });
 
+//Get User info
+const getUserInfo = asyncHandler(async (req, res) => {
+    const { credentialId } = req.body;
+    try {
+        const user = await User.findOne({ credentialKeys: credentialId });
+        if (user) {
+            return res.status(200).json({ user })
+            console.log(user);
+        }
+    } catch (err) {
+        return res.status(500).send(err)
+    }
+})
+
 //send otp mail
 const sendOTPEmail = asyncHandler(async (email, otp) => {
     try {
@@ -187,4 +201,4 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.status(200);
 });
 
-export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, verifyUserAuthentication, logoutUser };
+export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser };
