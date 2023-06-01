@@ -9,6 +9,8 @@ const app = new Vue({
     isRoaming: false,
     registrationData: null,
     authenticationData: null,
+    isRegisterNewDevice: false,
+    verifyOtp: null,
   },
   methods: {
     async checkIsRegistered() {
@@ -19,7 +21,7 @@ const app = new Vue({
       // const { isRegistered } = await response.json();
       // this.isRegistered = isRegistered;
     },
-    async register() {
+    async registerNewDevice() {
       try {
         const challenge = await this.requestChallenge();
         const registration = await client.register(this.username, challenge, {
@@ -40,6 +42,7 @@ const app = new Vue({
           body: JSON.stringify({
             username: this.username,
             verifyRegistrationData,
+            otp: this.verifyOtp
           }),
         });
 
@@ -121,7 +124,6 @@ const app = new Vue({
 
         if (response.ok) {
           // Authentication successful
-          console.log('Authentication successful');
           this.isAuthenticated = true;
           this.authenticationData = authentication
           this.$buefy.toast.open({

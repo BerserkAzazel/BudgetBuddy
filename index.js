@@ -28,7 +28,6 @@ app.use(cookieSession({
 }));
 app.use(cookieParser());
 
-
 // ...
 
 const currentModuleUrl = new URL(import.meta.url);
