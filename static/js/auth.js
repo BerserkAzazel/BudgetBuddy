@@ -12,22 +12,25 @@ const app = new Vue({
   },
   methods: {
     async checkIsRegistered() {
-      const response = await fetch('/api/checkIsRegistered');
-      const { isRegistered } = await response.json();
-      this.isRegistered = isRegistered;
+      //console.log(this.username + ' => ' + !!window.localStorage.getItem(this.username))
+      this.isRegistered = !!window.localStorage.getItem(this.username)
+      // const response = await fetch(`/api/checkIsRegistered?username=${ username }`);
+      // console.log(username)
+      // const { isRegistered } = await response.json();
+      // this.isRegistered = isRegistered;
     },
     async register() {
       try {
         const challenge = await this.requestChallenge();
         const registration = await client.register(this.username, challenge, {
-          authenticatorType: 'cross-platform',
+          authenticatorType: 'platform',
           userVerification: 'required',
           timeout: 60000,
           attestation: 'none',
           debug: false,
         });
 
-        const registrationData = await this.verifyRegistration(registration);
+        const verifyRegistrationData = await this.verifyRegistration(registration);
 
         const response = await fetch('/api/register', {
           method: 'POST',
@@ -36,19 +39,34 @@ const app = new Vue({
           },
           body: JSON.stringify({
             username: this.username,
-            registrationData,
+            verifyRegistrationData,
           }),
         });
 
         if (response.ok) {
           this.isRegistered = true;
           this.isAuthenticated = true;
-          this.registrationData = parsers.parseRegistration(registrationData)
+          this.registrationData = verifyRegistrationData
+          window.localStorage.setItem(this.username, verifyRegistrationData.credential.id)
+          // window.localStorage.setItem(this.registrationData, verifyRegistrationData)
+
+          this.$buefy.toast.open({
+            message: 'Registered!',
+            type: 'is-success'
+          })
         } else {
           console.error('Registration failed:', response.statusText);
+          this.$buefy.toast.open({
+            message: 'Registered failed',
+            type: 'is-danger'
+          })
         }
       } catch (error) {
         console.error('Registration failed:', error);
+        this.$buefy.toast.open({
+          message: 'Registered failed',
+          type: 'is-danger'
+        })
       }
     },
     async verifyRegistration(registration) {
@@ -65,10 +83,17 @@ const app = new Vue({
       if (response.ok) {
         this.isRegistered = true;
         this.isAuthenticated = true;
-        this.registrationData = parsers.parseRegistration(registrationData)
+        this.$buefy.toast.open({
+          message: 'Registered verification failed',
+          type: 'is-danger'
+        })
         return response.json();
       } else {
         console.error('Registration verification failed:', response.statusText);
+        this.$buefy.toast.open({
+          message: 'Registered verification failed',
+          type: 'is-danger'
+        })
         throw new Error('Registration verification failed');
       }
     },
@@ -81,58 +106,46 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const authentication = await client.authenticate([], challenge, {
-          authenticatorType: 'cross-platform',
+          authenticatorType: 'platform',
           userVerification: 'required',
           timeout: 60000,
           debug: false,
         });
 
-        const authenticationData = await this.verifyAuthentication(authentication);
-
+        // Send the authentication data to the server for verification
         const response = await fetch('/api/verifyAuthentication', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            authenticationData,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ authentication }),
         });
 
         if (response.ok) {
+          // Authentication successful
+          console.log('Authentication successful');
           this.isAuthenticated = true;
-          this.authenticationData = parser.parseAuthentication(authenticationData)
-
+          this.authenticationData = authentication
+          this.$buefy.toast.open({
+            message: 'Signed In!',
+            type: 'is-success'
+          })
+          // window.localStorage.setItem(this.authenticationData, authentication)
         } else {
-          console.error('Authentication failed:', response.statusText);
-          this.isAuthenticated = false;
+          // Authentication failed
+          console.error('Authentication failed');
+          this.$buefy.toast.open({
+            message: 'Signin failed',
+            type: 'is-danger'
+          })
         }
       } catch (error) {
-        console.error('Authentication failed:', error);
-        this.isAuthenticated = false;
+        console.error('Error during authentication:', error);
+        this.$buefy.toast.open({
+          message: 'signin failed',
+          type: 'is-danger'
+        })
       }
     },
-    async verifyAuthentication(authentication) {
-      const response = await fetch('/api/verifyAuthentication', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          authentication,
-        }),
-      });
 
-      if (response.ok) {
-        this.isAuthenticated = true;
-        this.authenticationData = parser.parseAuthentication(authenticationData)
-        return response.json();
-      } else {
-        console.error('Authentication verification failed:', response.statusText);
-        throw new Error('Authentication verification failed');
-      }
-    },
     async logout() {
       const response = await fetch('/api/logout', { method: 'POST' });
       if (response.ok) {
@@ -145,6 +158,8 @@ const app = new Vue({
     },
   },
   async mounted() {
+    this.isRegistered = !!window.localStorage.getItem(this.username)
+
     await this.checkIsRegistered();
   },
 });

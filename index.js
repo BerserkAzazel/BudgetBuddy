@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import cookieSession from 'cookie-session';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 import { connectDB } from './config/db.js';
 import { userRoutes } from './routes/userRoutes.js';
@@ -26,8 +28,7 @@ app.use(cookieSession({
 }));
 app.use(cookieParser());
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+
 // ...
 
 const currentModuleUrl = new URL(import.meta.url);
