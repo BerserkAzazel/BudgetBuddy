@@ -45,7 +45,7 @@ Welcome to BudgetBuddy, the all-in-one finance tracker application that helps yo
    ```shell
    npm start
    ```
-2. Open your web browser and visit `http://localhost:8000`.
+2. Open your web browser and visit `http://localhost:5000`.
 3. Sign in to your BudgetBuddy account using your registered credentials.
 4. Start tracking your finances, categorizing expenses, saving money, and exploring investment opportunities!
 
