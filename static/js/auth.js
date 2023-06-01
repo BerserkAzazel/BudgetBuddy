@@ -18,14 +18,13 @@ const app = new Vue({
   },
   methods: {
     async checkIsRegistered() {
-      //console.log(this.username + ' => ' + !!window.localStorage.getItem(this.username))
+      // // console.log(this.username + ' => ' + !!window.localStorage.getItem(this.username))
       this.isRegistered = !!window.localStorage.getItem(this.username)
       // const response = await fetch(`/api/checkIsRegistered?username=${ username }`);
-      // console.log(username)
+      //  // console.log(username)
       // const { isRegistered } = await response.json();
       // this.isRegistered = isRegistered;
     },
-    //register new devices for existing users
     async registerNewDevice() {
       try {
         const challenge = await this.requestChallenge();
@@ -46,7 +45,7 @@ const app = new Vue({
           },
           body: JSON.stringify({
             username: this.username,
-            regsitrationData: verifyRegistrationData,
+            verifyRegistrationData,
             otp: this.verifyOtp
           }),
         });
@@ -63,7 +62,7 @@ const app = new Vue({
             type: 'is-success'
           })
         } else {
-          // console.error('Registration failed:', response.statusText);
+          //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
           this.$buefy.toast.open({
             message: `Registered failed ${ response.message }`,
@@ -71,7 +70,7 @@ const app = new Vue({
           })
         }
       } catch (error) {
-        // console.error('Registration failed:', error.message);
+        //  // console.error('Registration failed:', error.message);
         this.isAuthenticated = false;
 
         this.$buefy.toast.open({
@@ -80,7 +79,6 @@ const app = new Vue({
         })
       }
     },
-    //register new users
     async register() {
       try {
         const challenge = await this.requestChallenge();
@@ -103,7 +101,7 @@ const app = new Vue({
             username: this.newusername,
             name: this.name,
             email: this.email,
-            regsitrationData: verifyRegistrationData,
+            verifyRegistrationData,
           }),
         });
 
@@ -120,7 +118,7 @@ const app = new Vue({
             type: 'is-success'
           })
         } else {
-          // console.error('Registration failed:', response.statusText);
+          //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
 
           this.$buefy.toast.open({
@@ -129,7 +127,7 @@ const app = new Vue({
           })
         }
       } catch (error) {
-        // console.error('Registration failed:', error);
+        //  // console.error('Registration failed:', error);
         this.isAuthenticated = false;
         this.$buefy.toast.open({
           message: `Registered failed: ${ error.message }`,
@@ -150,9 +148,12 @@ const app = new Vue({
 
       if (response.ok) {
         this.isRegistered = true;
+        this.isAuthenticated = true;
+
         return response.json();
       } else {
-        console.error('Registration verification failed:', response.statusText);
+        // console.error('Registration verification failed:', response.statusText);
+        this.isAuthenticated = false;
         throw new Error('Registration verification failed');
       }
     },
@@ -189,7 +190,7 @@ const app = new Vue({
           // window.localStorage.setItem(this.authenticationData, authentication)
         } else {
           // Authentication failed
-          // console.error(`Authentication failed: ${ response.message }`);
+          //  // console.error(`Authentication failed: ${ response.message }`);
           this.isAuthenticated = false;
 
           this.$buefy.toast.open({
@@ -198,7 +199,7 @@ const app = new Vue({
           })
         }
       } catch (error) {
-        // console.error('Error during authentication:', error);
+        //  // console.error('Error during authentication:', error);
         this.isAuthenticated = false;
 
         this.$buefy.toast.open({
@@ -220,11 +221,13 @@ const app = new Vue({
       // if (response.ok) {
 
       // } else {
-      //   // console.error('Logout failed:', response.statusText);
+      //   //  // console.error('Logout failed:', response.statusText);
       // }
     },
   },
   async mounted() {
+    this.isRegistered = !!window.localStorage.getItem(this.username)
+
     await this.checkIsRegistered();
   },
 });

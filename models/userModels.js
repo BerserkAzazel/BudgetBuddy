@@ -16,7 +16,7 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
-        regsitrationData: { type: mongoose.Schema.Types.Mixed },
+        verifyRegistrationData: { type: mongoose.Schema.Types.Mixed },
         credentialKeys: [{ type: String }],
     },
     { timestaps: true }

@@ -20,13 +20,13 @@ const getChallenge = (req, res) => {
 // Checking if user is registered
 const checkIsRegistered = asyncHandler(async (req, res) => {
     const { username } = req.body;
-    // console.log(userna);
+    //  // console.log(userna);
 
     try {
         const user = await User.findOne({ username });
         res.json({ isRegistered: !!user });
     } catch (error) {
-        console.error('Failed to check registration status:', error);
+        // console.error('Failed to check registration status:', error);
         res.status(500).send({ message: error.message });
     }
 });
@@ -56,14 +56,14 @@ const sendOTPEmail = asyncHandler(async (email, otp) => {
             html: "<b>Hello world?</b>", // html body
         });
 
-        console.log("Message sent: %s", info.messageId);
+        // console.log("Message sent: %s", info.messageId);
         // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
         // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     } catch (error) {
-        console.error('Failed to send OTP email:', error);
+        // console.error('Failed to send OTP email:', error);
     }
 });
 
@@ -78,13 +78,13 @@ function verifyOTP(otp) {
 
 // Registering new device for existing user
 const register = asyncHandler(async (req, res) => {
-    const { username, regsitrationData, otp } = req.body;
+    const { username, verifyRegistrationData, otp } = req.body;
 
     if (verifyOTP(otp)) {
         try {
             const user = await User.findOneAndUpdate(
                 { username },
-                { $set: { regsitrationData }, $push: { credentialKeys: regsitrationData.credential.id } },
+                { $set: { verifyRegistrationData }, $push: { credentialKeys: verifyRegistrationData.credential.id } },
                 //{ upsert: true, new: false }
             );
 
@@ -94,7 +94,7 @@ const register = asyncHandler(async (req, res) => {
                 res.status(500).send({ message: "User not found" });
             }
         } catch (error) {
-            console.error('Registration failed:', error);
+            // console.error('Registration failed:', error);
             res.status(500).send({ message: error.message });
         }
     } else {
@@ -113,7 +113,7 @@ const verifyRegistrationPayload = asyncHandler(async (req, res) => {
         });
         res.json(registrationData);
     } catch (error) {
-        console.error('Registration verification failed:', error);
+        // console.error('Registration verification failed:', error);
         res.status(500).send({ message: error.message });
     }
 });
@@ -121,12 +121,12 @@ const verifyRegistrationPayload = asyncHandler(async (req, res) => {
 
 const verifyUserAuthentication = asyncHandler(async (req, res) => {
     const { authentication } = req.body;
-    // console.log(authentication.credentialId);
+    //  // console.log(authentication.credentialId);
     try {
         const user = await User.findOne({ credentialKeys: authentication.credentialId });
 
         if (user) {
-            const credential = user.regsitrationData.credential
+            const credential = user.verifyRegistrationData.credential
             const expected = {
                 challenge: challenge,
                 origin: "http://localhost:5000",
@@ -143,14 +143,14 @@ const verifyUserAuthentication = asyncHandler(async (req, res) => {
             res.status(401).send({ message: "User not found" });
         }
     } catch (error) {
-        console.error('Authentication verification failed:', error);
+        // console.error('Authentication verification failed:', error);
         res.status(500).send({ message: error.message });
     }
 });
 
 // Register new users
 const registerNewUsers = asyncHandler(async (req, res) => {
-    const { username, email, regsitrationData, name } = req.body;
+    const { username, email, verifyRegistrationData, name } = req.body;
 
     try {
         const userExist = await User.findOne({ email });
@@ -166,16 +166,16 @@ const registerNewUsers = asyncHandler(async (req, res) => {
         const user = new User({
             username,
             email,
-            regsitrationData,
+            verifyRegistrationData,
             name,
-            credentialKeys: [regsitrationData.credential.id],
+            credentialKeys: [verifyRegistrationData.credential.id],
         });
 
         await user.save(); // Save the user to the database
 
         res.status(200).send({ message: "User registered successfully" });
     } catch (error) {
-        console.error('Registration failed:', error);
+        // console.error('Registration failed:', error);
         return res.status(500).json({ message: error.message });
     }
 });
