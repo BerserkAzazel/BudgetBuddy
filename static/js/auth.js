@@ -148,12 +148,9 @@ const app = new Vue({
 
       if (response.ok) {
         this.isRegistered = true;
-        this.isAuthenticated = true;
-
         return response.json();
       } else {
         console.error('Registration verification failed:', response.statusText);
-        this.isAuthenticated = false;
         throw new Error('Registration verification failed');
       }
     },
@@ -226,8 +223,6 @@ const app = new Vue({
     },
   },
   async mounted() {
-    this.isRegistered = !!window.localStorage.getItem(this.username)
-
     await this.checkIsRegistered();
   },
 });
