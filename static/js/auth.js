@@ -46,7 +46,7 @@ const app = new Vue({
           },
           body: JSON.stringify({
             username: this.username,
-            verifyRegistrationData,
+            regsitrationData: verifyRegistrationData,
             otp: this.verifyOtp
           }),
         });
@@ -103,7 +103,7 @@ const app = new Vue({
             username: this.newusername,
             name: this.name,
             email: this.email,
-            verifyRegistrationData,
+            regsitrationData: verifyRegistrationData,
           }),
         });
 

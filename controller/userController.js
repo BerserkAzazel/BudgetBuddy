@@ -78,13 +78,13 @@ function verifyOTP(otp) {
 
 // Registering new device for existing user
 const register = asyncHandler(async (req, res) => {
-    const { username, verifyRegistrationData, otp } = req.body;
+    const { username, regsitrationData, otp } = req.body;
 
     if (verifyOTP(otp)) {
         try {
             const user = await User.findOneAndUpdate(
                 { username },
-                { $set: { verifyRegistrationData }, $push: { credentialKeys: verifyRegistrationData.credential.id } },
+                { $set: { regsitrationData }, $push: { credentialKeys: regsitrationData.credential.id } },
                 //{ upsert: true, new: false }
             );
 
@@ -126,7 +126,7 @@ const verifyUserAuthentication = asyncHandler(async (req, res) => {
         const user = await User.findOne({ credentialKeys: authentication.credentialId });
 
         if (user) {
-            const credential = user.verifyRegistrationData.credential
+            const credential = user.regsitrationData.credential
             const expected = {
                 challenge: challenge,
                 origin: "http://localhost:5000",
@@ -150,7 +150,7 @@ const verifyUserAuthentication = asyncHandler(async (req, res) => {
 
 // Register new users
 const registerNewUsers = asyncHandler(async (req, res) => {
-    const { username, email, verifyRegistrationData, name } = req.body;
+    const { username, email, regsitrationData, name } = req.body;
 
     try {
         const userExist = await User.findOne({ email });
@@ -166,9 +166,9 @@ const registerNewUsers = asyncHandler(async (req, res) => {
         const user = new User({
             username,
             email,
-            verifyRegistrationData,
+            regsitrationData,
             name,
-            credentialKeys: [verifyRegistrationData.credential.id],
+            credentialKeys: [regsitrationData.credential.id],
         });
 
         await user.save(); // Save the user to the database
