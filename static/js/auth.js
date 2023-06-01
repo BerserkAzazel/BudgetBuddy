@@ -25,6 +25,7 @@ const app = new Vue({
       // const { isRegistered } = await response.json();
       // this.isRegistered = isRegistered;
     },
+    //register new devices for existing users
     async registerNewDevice() {
       try {
         const challenge = await this.requestChallenge();
@@ -79,6 +80,7 @@ const app = new Vue({
         })
       }
     },
+    //register new users
     async register() {
       try {
         const challenge = await this.requestChallenge();
