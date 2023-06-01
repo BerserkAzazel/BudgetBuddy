@@ -18,7 +18,7 @@ const getChallenge = (req, res) => {
 };
 
 // Checking if user is registered
-const checkIsRegistered = async (req, res) => {
+const checkIsRegistered = asyncHandler(async (req, res) => {
     const { username } = req.body;
     // console.log(userna);
 
@@ -27,12 +27,12 @@ const checkIsRegistered = async (req, res) => {
         res.json({ isRegistered: !!user });
     } catch (error) {
         console.error('Failed to check registration status:', error);
-        res.sendStatus(500).json({ message: error.message });
+        res.status(500).send({ message: error.message });
     }
-};
+});
 
 //send otp mail
-const sendOTPEmail = async (email, otp) => {
+const sendOTPEmail = asyncHandler(async (email, otp) => {
     try {
         // Create a transporter using your email service provider credentials
         let testAccount = await nodemailer.createTestAccount();
@@ -65,7 +65,7 @@ const sendOTPEmail = async (email, otp) => {
     } catch (error) {
         console.error('Failed to send OTP email:', error);
     }
-}
+});
 
 // OTP verification function
 function verifyOTP(otp) {
@@ -76,8 +76,8 @@ function verifyOTP(otp) {
     return otp === '123456'; // Replace with your actual OTP verification logic
 }
 
-// Registering user
-const register = async (req, res) => {
+// Registering new device for existing user
+const register = asyncHandler(async (req, res) => {
     const { username, verifyRegistrationData, otp } = req.body;
 
     if (verifyOTP(otp)) {
@@ -85,25 +85,25 @@ const register = async (req, res) => {
             const user = await User.findOneAndUpdate(
                 { username },
                 { $set: { verifyRegistrationData }, $push: { credentialKeys: verifyRegistrationData.credential.id } },
-                { upsert: true, new: true }
+                //{ upsert: true, new: false }
             );
 
             if (user) {
-                res.sendStatus(200);
+                res.status(200);
             } else {
-                res.sendStatus(500).json({ message: "User not found" });
+                res.status(500).send({ message: "User not found" });
             }
         } catch (error) {
             console.error('Registration failed:', error);
-            res.sendStatus(500).json({ message: error.message });
+            res.status(500).send({ message: error.message });
         }
     } else {
         res.status(400).json({ message: 'Invalid OTP' });
     }
-};
+});
 
 // Verifying registration payload
-const verifyRegistrationPayload = async (req, res) => {
+const verifyRegistrationPayload = asyncHandler(async (req, res) => {
     const { registration } = req.body;
 
     try {
@@ -114,12 +114,12 @@ const verifyRegistrationPayload = async (req, res) => {
         res.json(registrationData);
     } catch (error) {
         console.error('Registration verification failed:', error);
-        res.sendStatus(500).json({ message: error.message });
+        res.status(500).send({ message: error.message });
     }
-};
+});
 
 
-const verifyUserAuthentication = async (req, res) => {
+const verifyUserAuthentication = asyncHandler(async (req, res) => {
     const { authentication } = req.body;
     // console.log(authentication.credentialId);
     try {
@@ -137,22 +137,54 @@ const verifyUserAuthentication = async (req, res) => {
             await server.verifyAuthentication(authentication, credential, expected);
 
             // Authentication successful
-            res.sendStatus(200).json({ message: "Authentication successful" });
+            res.status(200).send({ message: "Authentication successful" });
         } else {
             // User not found
-            res.sendStatus(401).json({ message: "User not found" });
+            res.status(401).send({ message: "User not found" });
         }
     } catch (error) {
         console.error('Authentication verification failed:', error);
-        res.sendStatus(500).json({ message: error.message });
+        res.status(500).send({ message: error.message });
     }
-};
+});
+
+// Register new users
+const registerNewUsers = asyncHandler(async (req, res) => {
+    const { username, email, verifyRegistrationData, name } = req.body;
+
+    try {
+        const userExist = await User.findOne({ email });
+        const usernameExist = await User.findOne({ username });
+
+        if (userExist) {
+            return res.status(500).send({ message: "Email already exists" });
+        }
+        if (usernameExist) {
+            return res.status(500).send({ message: "Username already exists" });
+        }
+
+        const user = new User({
+            username,
+            email,
+            verifyRegistrationData,
+            name,
+            credentialKeys: [verifyRegistrationData.credential.id],
+        });
+
+        await user.save(); // Save the user to the database
+
+        res.status(200).send({ message: "User registered successfully" });
+    } catch (error) {
+        console.error('Registration failed:', error);
+        return res.status(500).json({ message: error.message });
+    }
+});
 
 
 // Logging out user
-const logoutUser = async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
     // Clear authentication state or session
-    res.sendStatus(200);
-};
+    res.status(200);
+});
 
-export { getChallenge, checkIsRegistered, register, verifyRegistrationPayload, verifyUserAuthentication, logoutUser };
+export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, verifyUserAuthentication, logoutUser };

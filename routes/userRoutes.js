@@ -1,5 +1,5 @@
 import express from 'express';
-import { getChallenge, checkIsRegistered, register, verifyRegistrationPayload, verifyUserAuthentication, logoutUser } from '../controller/userController.js';
+import { getChallenge, checkIsRegistered, registerNewUsers, register, verifyRegistrationPayload, verifyUserAuthentication, logoutUser } from '../controller/userController.js';
 
 const userRoutes = express.Router();
 
@@ -9,8 +9,11 @@ userRoutes.get('/getChallenge', getChallenge);
 // Checking if user is registered
 userRoutes.get('/checkIsRegistered', checkIsRegistered);
 
-// Registering user
+// Registering new device for existing user
 userRoutes.post('/register', register);
+
+// Registering new user
+userRoutes.post('/registernewusers', registerNewUsers);
 
 // Verifying registration payload
 userRoutes.post('/verifyRegistration', verifyRegistrationPayload);
