@@ -53,14 +53,15 @@ const app = new Vue({
         if (response.ok) {
           this.isRegistered = true;
           this.isAuthenticated = true;
-          this.registrationData = verifyRegistrationData
-          window.localStorage.setItem(this.username, verifyRegistrationData.credential.id)
-          // window.localStorage.setItem(this.registrationData, verifyRegistrationData)
+          // // this.registrationData = verifyRegistrationData
+          window.localStorage.setItem("username", verifyRegistrationData.credential.id)
+          // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
 
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
           })
+          window.location.replace('/user');
         } else {
           //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
@@ -108,16 +109,18 @@ const app = new Vue({
         if (response.ok) {
           this.isRegistered = true;
           this.isAuthenticated = true;
-          this.registrationData = verifyRegistrationData
-          window.localStorage.setItem(this.username, verifyRegistrationData.credential.id)
+          // this.registrationData = verifyRegistrationData
+          window.localStorage.setItem("username", verifyRegistrationData.credential.id)
           this.username = this.newusername
-          // window.localStorage.setItem(this.registrationData, verifyRegistrationData)
+          // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
 
 
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
           })
+          window.location.replace('/user');
+
         } else {
           //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
@@ -183,13 +186,13 @@ const app = new Vue({
         if (response.ok) {
           // Authentication successful
           this.isAuthenticated = true;
-          this.authenticationData = authentication
+          // this.authenticationData= authentication
           this.$buefy.toast.open({
             message: 'Signed In!',
             type: 'is-success'
           })
-
-          // window.localStorage.setItem(this.authenticationData, authentication)
+          window.localStorage.setItem("username", authentication.credentialId)
+          window.location.replace('/user');
         } else {
           // Authentication failed
           //  // console.error(`Authentication failed: ${ response.message }`);
@@ -224,23 +227,10 @@ const app = new Vue({
         console.error(response.statusText)
       }
     },
-    async logout() {
-      this.isAuthenticated = false;
-      this.authenticationData = null
-      this.registrationData = null
-      this.username = null
-      this.newusername = null
-      this.email = null
-      this.name = null
-      // const response = await fetch('/api/logout', { method: 'POST' });
-      // if (response.ok) {
-
-      // } else {
-      //   //  // console.error('Logout failed:', response.statusText);
-      // }
-    },
   },
 
   async mounted() {
+    const auth = !!window.localStorage.getItem("username")
+    if (auth) window.location.replace('/user')
   },
 });

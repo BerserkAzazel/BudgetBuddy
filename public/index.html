@@ -55,18 +55,6 @@
             :disabled="!isRegistered || !username ">Authenticate</b-button>
         </div>
       </template>
-      <template v-if="isAuthenticated">
-        <section v-if="registrationData || authenticationData" style="text-align: left;">
-          <p><b>Hello {{name}}</b></p>
-          <p><b>Email: </b>{{email}}</p>
-          <p><b>Username: </b>{{username}}</p>
-          <p><b>Registration Data: </b>{{registrationData}}</p>
-          <p><b>Authentication Data: </b>{{authenticationData}}</p>
-        </section>
-        <div>
-          <b-button type="is-primary" @click="logout()">Sign Out</b-button>
-        </div>
-      </template>
     </main>
 
     <script src="https://unpkg.com/vue@2"></script>

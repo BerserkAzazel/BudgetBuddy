@@ -40,6 +40,10 @@ const publicDirPath = join(currentModulePath, '.', 'public');
 app.get('/', function (req, res) {
     res.sendFile(join(publicDirPath, 'index.html'));
 });
+
+app.get('/user', function (req, res) {
+    res.sendFile(join(publicDirPath, 'app.html'));
+});
 // ...
 
 
