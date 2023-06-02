@@ -2,6 +2,12 @@ import asyncHandler from "express-async-handler";
 import User from "../models/userModels.js";
 import { server } from "@passwordless-id/webauthn";
 import nodemailer from "nodemailer";
+import { Configuration, OpenAIApi } from "openai";
+
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
 
 let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e"
 // Custom challenge generation
@@ -201,4 +207,29 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.status(200);
 });
 
-export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser };
+const getActionInfo = asyncHandler(async (req, res) => {
+    const body = req?.body?.action;// action passed from frontend
+    const email = req?.body?.email;//email passed from frontend
+    if (body) {
+      const response = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `The following is an action and the category its falls into among categories of [Investments, Savings, Income, Expenses] and the money mentioned in the action:\n\n${body}\n\ ${body}\nCategory:\nMoney:`,
+        temperature: 0,
+        max_tokens: 64,
+        top_p: 1.0,
+        frequency_penalty: 0.0,
+        presence_penalty: 0.0,
+      });
+      const category = response.data.choices[0].text;
+        const money = response.data.choices[1].text;
+        
+        const user = await User.findOneAndUpdate({email}, {$set:{ [category]: money }},{new:true});
+        if(user){
+            return res.status(200).json({user})
+        }
+        return res.status(500).json({message:"User not found"})
+    }
+    res.send("No action provided");
+});
+
+export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser, getActionInfo };
