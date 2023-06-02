@@ -207,7 +207,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.status(200);
 });
 
-const getActionInfo = asyncHandler(async (req, res) => {
+const postActionInfo = asyncHandler(async (req, res) => {
     const body = req?.body?.action;// action passed from frontend
     const email = req?.body?.email;//email passed from frontend
     if (body) {
@@ -232,4 +232,4 @@ const getActionInfo = asyncHandler(async (req, res) => {
     res.send("No action provided");
 });
 
-export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser, getActionInfo };
+export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser, postActionInfo };
