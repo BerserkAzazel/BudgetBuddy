@@ -9,6 +9,34 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const postActionInfo = asyncHandler(async (req, res) => {
+    const body = req?.body?.action;// action passed from frontend
+    const email = req?.body?.email;//email passed from frontend
+    if (body) {
+           const response = await openai.createCompletion({
+             model: "text-davinci-003",
+             prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${body}\n\nCategory: \nMoney:`,
+             temperature: 0,
+             max_tokens: 64,
+             top_p: 1.0,
+             frequency_penalty: 0.0,
+             presence_penalty: 0.0,
+           });
+          const remain = response.data.choices[0].text.split("\n")[1];
+          const category = remain.split(", ")[0];
+          const money = remain.split(", ")[1];
+        
+
+        const user = await User.findOneAndUpdate({email}, {$inc:{ [category]: money }},{new:true});
+        if(user){
+            return res.status(200).json({user})
+        }
+        return res.status(500).json({message:"User not found"})
+    }
+    res.send("No action provided");
+});
+
+
 let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e";
 
 // Requesting challenge
@@ -224,31 +252,6 @@ const registerNewUsers = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
     req.session = null;
     res.redirect("/");
-});
-
-const postActionInfo = asyncHandler(async (req, res) => {
-    const body = req?.body?.action;// action passed from frontend
-    const email = req?.body?.email;//email passed from frontend
-    if (body) {
-        const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt: `The following is an action and the category its falls into among categories of [Investments, Savings, Income, Expenses] and the money mentioned in the action:\n\n${ body }\n\ ${ body }\nCategory:\nMoney:`,
-            temperature: 0,
-            max_tokens: 64,
-            top_p: 1.0,
-            frequency_penalty: 0.0,
-            presence_penalty: 0.0,
-        });
-        const category = response.data.choices[0].text;
-        const money = response.data.choices[1].text;
-
-        const user = await User.findOneAndUpdate({ email }, { $set: { [category]: money } }, { new: true });
-        if (user) {
-            return res.status(200).json({ user })
-        }
-        return res.status(500).json({ message: "User not found" })
-    }
-    res.send("No action provided");
 });
 
 export {
