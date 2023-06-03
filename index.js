@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 
 import { connectDB } from './config/db.js';
 import { userRoutes } from './routes/userRoutes.js';
+import isAuthenticated from './middleware/authMiddleware.js';
 
 dotenv.config();
 connectDB();
@@ -22,7 +23,6 @@ app.use(express.json());
 app.use(cookieSession({
     name: 'session',
     keys: [crypto.randomBytes(32).toString('hex')],
-
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
@@ -36,13 +36,19 @@ const currentModulePath = dirname(fileURLToPath(currentModuleUrl));
 const staticDirPath = join(currentModulePath, '.', 'static');
 app.use(express.static(staticDirPath));
 
+
+
 const publicDirPath = join(currentModulePath, '.', 'public');
 app.get('/', function (req, res) {
     res.sendFile(join(publicDirPath, 'index.html'));
 });
 
-app.get('/user', function (req, res) {
+app.get('/user', isAuthenticated, function (req, res) {
     res.sendFile(join(publicDirPath, 'app.html'));
+});
+
+app.get('/app', isAuthenticated, function (req, res) {
+    res.sendFile(join(publicDirPath, 'dataviz.html'));
 });
 // ...
 
