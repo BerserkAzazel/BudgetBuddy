@@ -44,7 +44,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/user', isAuthenticated, function (req, res) {
-    res.sendFile(join(publicDirPath, 'app.html'));
+    res.sendFile(join(publicDirPath, 'user.html'));
 });
 
 app.get('/app', isAuthenticated, function (req, res) {
