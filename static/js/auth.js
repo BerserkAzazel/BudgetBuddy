@@ -32,7 +32,7 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const registration = await client.register(this.username, challenge, {
-          authenticatorType: 'platform',
+          authenticatorType: this.isRoaming ? 'roaming' : 'auto',
           userVerification: 'required',
           timeout: 60000,
           attestation: 'none',
@@ -86,7 +86,7 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const registration = await client.register(this.newusername, challenge, {
-          authenticatorType: 'platform',
+          authenticatorType: this.isRoaming ? 'roaming' : 'auto',
           userVerification: 'required',
           timeout: 60000,
           attestation: 'none',
@@ -169,7 +169,7 @@ const app = new Vue({
       try {
         const challenge = await this.requestChallenge();
         const authentication = await client.authenticate([], challenge, {
-          authenticatorType: 'platform',
+          authenticatorType: this.isRoaming ? 'roaming' : 'auto',
           userVerification: 'required',
           timeout: 60000,
           debug: false,
