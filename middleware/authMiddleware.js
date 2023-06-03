@@ -4,8 +4,7 @@ const isAuthenticated = (req, res, next) => {
         next();
     } else {
         // User is not authenticated, send an unauthorized response
-        res.redirect('/');
-        res.status(401).json({ message: 'Unauthorized' });
+        res.status(401).json({ message: 'Unauthorized' }).redirect('/');
     }
 };
 

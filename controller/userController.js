@@ -9,81 +9,71 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e"
-// Custom challenge generation
-// const generateChallenge = () => {
-//     const challenge = Math.random().toString(36).substr(2, 10);
-//     return challenge;
-// };
+let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e";
 
 // Requesting challenge
 const getChallenge = (req, res) => {
-    // Generate and return a challenge
-    // const challenge = generateChallenge();
     res.json({ challenge });
 };
 
 // Checking if user is registered
 const checkIsRegistered = asyncHandler(async (req, res) => {
     const { username } = req.body;
-    //  // console.log(userna);
 
     try {
         const user = await User.findOne({ username });
         res.json({ isRegistered: !!user });
     } catch (error) {
-        // console.error('Failed to check registration status:', error);
         res.status(500).send({ message: error.message });
     }
 });
 
-//Get User info
+// Get User info
 const getUserInfo = asyncHandler(async (req, res) => {
     const { credentialId } = req.body;
+
     try {
         const user = await User.findOne({ credentialKeys: credentialId });
         if (user) {
-            return res.status(200).json({ user })
-            console.log(user);
+            res.status(200).json({ user });
+        } else {
+            res.status(404).json({ message: "User not found" });
         }
     } catch (err) {
-        return res.status(500).send(err)
+        res.status(500).send({ message: err.message });
     }
-})
+});
 
-//send otp mail
+// Send OTP mail
 const sendOTPEmail = asyncHandler(async (email, otp) => {
     try {
         // Create a transporter using your email service provider credentials
         let testAccount = await nodemailer.createTestAccount();
 
-        // create reusable transporter object using the default SMTP transport
+        // Create reusable transporter object using the default SMTP transport
         let transporter = nodemailer.createTransport({
             host: "smtp.ethereal.email",
             port: 587,
-            secure: false, // true for 465, false for other ports
+            secure: false,
             auth: {
-                user: testAccount.user, // generated ethereal user
-                pass: testAccount.pass, // generated ethereal password
+                user: testAccount.user,
+                pass: testAccount.pass,
             },
         });
-        // send mail with defined transport object
+
+        // Send mail with defined transport object
         let info = await transporter.sendMail({
-            from: '"Fred Foo 👻" <foo@example.com>', // sender address
-            to: email, // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: `Hello world?${ otp }`, // plain text body
-            html: "<b>Hello world?</b>", // html body
+            from: '"Fred Foo 👻" <foo@example.com>',
+            to: email,
+            subject: "Hello ✔",
+            text: `Hello world? ${ otp }`,
+            html: "<b>Hello world?</b>",
         });
 
-        // console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-        // Preview only available when sending through an Ethereal account
-        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+        console.log("Message sent: %s", info.messageId);
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
     } catch (error) {
-        // console.error('Failed to send OTP email:', error);
+        console.error("Failed to send OTP email:", error);
     }
 });
 
@@ -93,10 +83,10 @@ function verifyOTP(otp) {
     // ...
 
     // Return true if OTP is valid, false otherwise
-    return otp === '123456'; // Replace with your actual OTP verification logic
+    return otp === "123456"; // Replace with your actual OTP verification logic
 }
 
-// Registering new device for existing user
+// Registering new device for an existing user
 const register = asyncHandler(async (req, res) => {
     const { username, verifyRegistrationData, otp } = req.body;
 
@@ -104,22 +94,24 @@ const register = asyncHandler(async (req, res) => {
         try {
             const user = await User.findOneAndUpdate(
                 { username },
-                { $set: { verifyRegistrationData }, $push: { credentialKeys: verifyRegistrationData.credential.id } },
-                //{ upsert: true, new: false }
+                {
+                    $set: { verifyRegistrationData },
+                    $push: { credentialKeys: verifyRegistrationData.credential.id },
+                },
+                { new: true }
             );
 
             if (user) {
                 req.session.isAuthenticated = true;
-                res.status(200).redirect('/user');
+                res.redirect("/user");
             } else {
-                res.status(500).json({ message: "User not found" });
+                res.status(404).json({ message: "User not found" });
             }
         } catch (error) {
-            // console.error('Registration failed:', error);
             res.status(500).send({ message: error.message });
         }
     } else {
-        res.status(400).json({ message: 'Invalid OTP' });
+        res.status(400).json({ message: "Invalid OTP" });
     }
 });
 
@@ -130,24 +122,22 @@ const verifyRegistrationPayload = asyncHandler(async (req, res) => {
     try {
         const registrationData = await server.verifyRegistration(registration, {
             challenge,
-            origin: "http://localhost:5000"
+            origin: "http://localhost:5000",
         });
         res.json(registrationData);
     } catch (error) {
-        // console.error('Registration verification failed:', error);
         res.status(500).send({ message: error.message });
     }
 });
 
-
 const verifyUserAuthentication = asyncHandler(async (req, res) => {
     const { authentication } = req.body;
-    //  // console.log(authentication.credentialId);
+
     try {
         const user = await User.findOne({ credentialKeys: authentication.credentialId });
 
         if (user) {
-            const credential = user.verifyRegistrationData.credential
+            const credential = user.verifyRegistrationData.credential;
             const expected = {
                 challenge: challenge,
                 origin: "http://localhost:5000",
@@ -157,14 +147,11 @@ const verifyUserAuthentication = asyncHandler(async (req, res) => {
 
             await server.verifyAuthentication(authentication, credential, expected);
             req.session.isAuthenticated = true;
-            // Authentication successful
-            res.status(200).json({ message: "Authentication successful" }).redirect('/user');
+            res.redirect("/user");
         } else {
-            // User not found
-            res.status(401).send({ message: "User not found" });
+            res.status(401).json({ message: "User not found" });
         }
     } catch (error) {
-        // console.error('Authentication verification failed:', error);
         res.status(500).send({ message: error.message });
     }
 });
@@ -178,10 +165,10 @@ const registerNewUsers = asyncHandler(async (req, res) => {
         const usernameExist = await User.findOne({ username });
 
         if (userExist) {
-            return res.status(500).send({ message: "Email already exists" });
+            return res.status(400).json({ message: "Email already exists" });
         }
         if (usernameExist) {
-            return res.status(500).send({ message: "Username already exists" });
+            return res.status(400).json({ message: "Username already exists" });
         }
 
         const user = new User({
@@ -192,21 +179,18 @@ const registerNewUsers = asyncHandler(async (req, res) => {
             credentialKeys: [verifyRegistrationData.credential.id],
         });
 
-        await user.save(); // Save the user to the database
+        await user.save();
         req.session.isAuthenticated = true;
-        res.status(200).json({ message: "User registered successfully" }).redirect('/user');
+        res.redirect("/user");
     } catch (error) {
-        // console.error('Registration failed:', error);
-        return res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
-
 // Logging out user
 const logoutUser = asyncHandler(async (req, res) => {
-    // Clear authentication state or session
     req.session = null;
-    res.status(200).redirect('/');
+    res.redirect("/");
 });
 
 const postActionInfo = asyncHandler(async (req, res) => {
@@ -237,11 +221,13 @@ const postActionInfo = asyncHandler(async (req, res) => {
 export {
     getChallenge,
     checkIsRegistered,
-    register,
-    registerNewUsers,
-    verifyRegistrationPayload,
     getUserInfo,
+    sendOTPEmail,
+    verifyOTP,
+    register,
+    verifyRegistrationPayload,
     verifyUserAuthentication,
+    registerNewUsers,
     logoutUser,
-    postActionInfo
+    postActionInfo,
 };
