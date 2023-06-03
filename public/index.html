@@ -44,17 +44,21 @@
           <b-checkbox v-model="isRoaming">Use roaming authenticator (phone, usb key...)</b-checkbox>
           <b-checkbox v-model="isRegisterNewDevice">Register New Device</b-checkbox>
         </b-field>
-        <b-field>
-          <b-input v-model="verifyOtp" placeholder="Verify Otp" v-show="isRegisterNewDevice"></b-input>
+        <b-field v-show="isRegisterNewDevice">
+          <b-input v-model="otp" placeholder="Enter OTP to Verify"></b-input>
+          <b-button type="is-primary" @click="requestOTP" :disabled="!username">Request OTP</b-button>
+          <b-button type="is-primary" @click="verifyOTP" :disabled="!otp || !username">Verify OTP</b-button>
         </b-field>
         <div>
-          <b-button type="is-primary" @click="registerNewDevice()" :disabled="!username || !verifyOtp"
+          <b-button type="is-primary" @click="registerNewDevice()" :disabled="!username || !otp"
             v-show="isRegisterNewDevice">Register
             New Device</b-button>
           <b-button type="is-primary" @click="login()" v-show="!isRegisterNewDevice"
             :disabled="!isRegistered || !username ">Authenticate</b-button>
         </div>
-
+        <p v-if="errorMessage">{{ errorMessage }}</p>
+        <p v-if="successMessage">{{ successMessage }}</p>
+        </div>
       </template>
     </main>
 

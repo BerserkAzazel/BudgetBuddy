@@ -14,7 +14,10 @@ const app = new Vue({
     registrationData: null,
     authenticationData: null,
     isRegisterNewDevice: false,
-    verifyOtp: null,
+    otp: null,
+    errorMessage: '',
+    successMessage: '',
+    otpVerified: false,
   },
   methods: {
     async checkIsRegistered() {
@@ -46,7 +49,6 @@ const app = new Vue({
           body: JSON.stringify({
             username: this.username,
             verifyRegistrationData,
-            otp: this.verifyOtp
           }),
         });
 
@@ -208,6 +210,60 @@ const app = new Vue({
           type: 'is-danger'
         })
       }
+    },
+    requestOTP() {
+      this.errorMessage = '';
+      this.successMessage = '';
+
+      // Make API call to request OTP
+      fetch('/api/generate-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: this.username,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.successMessage = data.message;
+          this.otpVerified = true;
+        })
+        .catch((error) => {
+          this.errorMessage = 'Failed to request OTP';
+          console.error(error);
+        });
+    },
+    verifyOTP() {
+      this.errorMessage = '';
+      this.successMessage = '';
+
+      // Make API call to verify OTP
+      fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: this.username,
+          otp: this.otp,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            this.successMessage = data.message;
+            // Perform additional actions upon successful OTP verification
+            // e.g., redirect to another page, update UI, etc.
+          } else {
+            this.errorMessage = data.message;
+          }
+        })
+        .catch((error) => {
+          this.errorMessage = 'Failed to verify OTP';
+          console.error(error);
+        });
     },
   },
 

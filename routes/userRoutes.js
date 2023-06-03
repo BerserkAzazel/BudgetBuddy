@@ -8,7 +8,9 @@ import {
     verifyRegistrationPayload,
     verifyUserAuthentication,
     logoutUser,
-    postActionInfo
+    postActionInfo,
+    generateOTP,
+    verifyOTP
 } from '../controller/userController.js';
 
 const userRoutes = express.Router();
@@ -24,6 +26,12 @@ userRoutes.post('/register', register);
 
 // Registering new user
 userRoutes.post('/registernewusers', registerNewUsers);
+
+// generate otp
+userRoutes.post('/generate-otp', generateOTP);
+
+//verify otp
+userRoutes.post('/verify-otp', verifyOTP);
 
 // Verifying registration payload
 userRoutes.post('/verifyRegistration', verifyRegistrationPayload);

@@ -44,74 +44,107 @@ const getUserInfo = asyncHandler(async (req, res) => {
     }
 });
 
-// Send OTP mail
-const sendOTPEmail = asyncHandler(async (email, otp) => {
+// Generate OTP
+function generateOTPcode() {
+    const digits = '0123456789';
+    let otp = '';
+    for (let i = 0; i < 6; i++) {
+        otp += digits[Math.floor(Math.random() * 10)];
+    }
+    return otp;
+}
+
+// Send OTP email
+async function sendOTPEmail(email, otp) {
     try {
         // Create a transporter using your email service provider credentials
-        let testAccount = await nodemailer.createTestAccount();
-
-        // Create reusable transporter object using the default SMTP transport
         let transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
+            host: 'smtp.ethereal.email',
             port: 587,
-            secure: false,
             auth: {
-                user: testAccount.user,
-                pass: testAccount.pass,
-            },
+                user: 'alexandra.walter35@ethereal.email',
+                pass: 'hVBDmbkMfzs7es3rJf'
+            }
         });
 
-        // Send mail with defined transport object
+        // send mail with defined transport object
         let info = await transporter.sendMail({
-            from: '"Fred Foo 👻" <foo@example.com>',
+            from: '"Alexandra Walter" <alexandra.walter35@ethereal.email>', // Replace with your email address
             to: email,
-            subject: "Hello ✔",
-            text: `Hello world? ${ otp }`,
-            html: "<b>Hello world?</b>",
+            subject: 'OTP Verification',
+            text: `Your OTP: ${ otp }`,
+            html: `<p>Your OTP: <strong>${ otp }</strong></p>`,
         });
-
-        console.log("Message sent: %s", info.messageId);
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        console.log('Email sent:', info.messageId);
     } catch (error) {
-        console.error("Failed to send OTP email:", error);
+        console.error('Failed to send OTP email:', error);
+    }
+}
+
+//verify email otp
+const verifyOTP = asyncHandler(async (req, res) => {
+    const { username, otp } = req.body;
+    const storedOTP = req.session.otp;
+
+    if (storedOTP && storedOTP === otp) {
+        // OTP is correct
+        req.session.otp = null; // Clear the OTP from session after successful verification
+
+        // Perform additional actions here (e.g., update user data, grant access, etc.)
+        res.json({ success: true, message: 'OTP verification successful' });
+    } else {
+        // OTP is incorrect
+        res.status(401).json({ success: false, message: 'Invalid OTP' });
+    }
+})
+
+//generate otp
+const generateOTP = asyncHandler(async (req, res) => {
+    const { username } = req.body;
+
+    try {
+        const user = await User.findOne({ username });
+        if (user) {
+            const otp = generateOTPcode();
+
+            // Store the OTP in the session
+            req.session.otp = otp;
+
+            // Send OTP email
+            sendOTPEmail(user.email, otp);
+
+            res.json({ message: 'OTP generated and email sent successfully' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Failed to generate OTP:', error);
+        res.status(500).json({ message: 'Failed to generate OTP' });
     }
 });
-
-// OTP verification function
-function verifyOTP(otp) {
-    // Perform OTP verification logic here
-    // ...
-
-    // Return true if OTP is valid, false otherwise
-    return otp === "123456"; // Replace with your actual OTP verification logic
-}
 
 // Registering new device for an existing user
 const register = asyncHandler(async (req, res) => {
     const { username, verifyRegistrationData, otp } = req.body;
 
-    if (verifyOTP(otp)) {
-        try {
-            const user = await User.findOneAndUpdate(
-                { username },
-                {
-                    $set: { verifyRegistrationData },
-                    $push: { credentialKeys: verifyRegistrationData.credential.id },
-                },
-                { new: true }
-            );
+    try {
+        const user = await User.findOneAndUpdate(
+            { username },
+            {
+                $set: { verifyRegistrationData },
+                $push: { credentialKeys: verifyRegistrationData.credential.id },
+            },
+            { new: true }
+        );
 
-            if (user) {
-                req.session.isAuthenticated = true;
-                res.redirect("/user");
-            } else {
-                res.status(404).json({ message: "User not found" });
-            }
-        } catch (error) {
-            res.status(500).send({ message: error.message });
+        if (user) {
+            req.session.isAuthenticated = true;
+            res.redirect("/user");
+        } else {
+            res.status(404).json({ message: "User not found" });
         }
-    } else {
-        res.status(400).json({ message: "Invalid OTP" });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
     }
 });
 
@@ -222,7 +255,7 @@ export {
     getChallenge,
     checkIsRegistered,
     getUserInfo,
-    sendOTPEmail,
+    generateOTP,
     verifyOTP,
     register,
     verifyRegistrationPayload,
