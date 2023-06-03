@@ -39,8 +39,13 @@ app.use(express.static(staticDirPath));
 
 
 const publicDirPath = join(currentModulePath, '.', 'public');
+
 app.get('/', function (req, res) {
     res.sendFile(join(publicDirPath, 'index.html'));
+});
+
+app.get('/auth', function (req, res) {
+    res.sendFile(join(publicDirPath, 'auth.html'));
 });
 
 app.get('/user', isAuthenticated, function (req, res) {

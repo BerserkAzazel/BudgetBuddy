@@ -18,8 +18,18 @@ const app = new Vue({
     errorMessage: '',
     successMessage: '',
     otpVerified: false,
+    isLogin: false,
+    isRegister: true,
   },
   methods: {
+    async gotoLogin() {
+      this.isLogin = true;
+      this.isRegister = false;
+    },
+    async gotoRegister() {
+      this.isLogin = false;
+      this.isRegister = true;
+    },
     async checkIsRegistered() {
       // // console.log(this.username + ' => ' + !!window.localStorage.getItem(this.username))
       this.isRegistered = !!window.localStorage.getItem(this.username)
