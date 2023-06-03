@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>TradeGPT</title>
   </head>
   <body>
-    <form>
+    <form onsubmit="function a(event) {
+      event.preventDefault();
+      askQuestion();
+    }">
       <input type="text" id="user-input" placeholder="Ask a question" />
-      <input type="submit" value="Ask" onclick="askQuestion()" />
+      <button type="submit" value="Ask">Ask</button>
     </form>
     <div id="chat-window"></div>
 
@@ -17,19 +20,18 @@
       const chatWindow = document.getElementById("chat-window");
       const userInput = document.getElementById("user-input");
 
-       async function askQuestion() {
+      async function askQuestion() {
         const question = userInput.value;
         userInput.value = "";
-        const res = await fetch("/chat", {
+        const res = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: {
-            "action": JSON.stringify(question),
-      }
+          body: JSON.stringify({ action: question }),
         });
-        const {answer} = await res.json();
+        const { answer } = await res.json();
+        console.log(answer);
         const answerElement = document.createElement("div");
         answerElement.innerText = `${answer}`;
         chatWindow.appendChild(answerElement);

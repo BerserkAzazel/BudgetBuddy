@@ -1,4 +1,28 @@
-var data = [100, 200, 300, 400]; //add custom data here
+      async function getUserInfo(credentialId) {
+          try {
+              const response = await fetch('/api/info', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      credentialId,
+                  }),
+              });
+              if (response.ok) {
+                  const res = await response.json();
+                  return { res };
+              } else {
+                  console.error(response.statusText);
+                  return new Error(response.statusText);
+              }
+          } catch (error) {
+              console.error('Failed to fetch user info:', error);
+              return new Error(error);
+          }
+      }
+
+      getUserInfo(window.localStorage.getItem('username')).then(async (user) => {
+var data = [user.res.user.Investments, user.res.user.Savings, user.res.user.Expenses, user.res.user.Income];
+console.log(data) //add custom data here
 var sum = d3.sum(data);
 var innerRadius = [60, 100, 140, 180]; //adjust the inner and outer radius from here
 var outerRadius = [90, 130, 170, 210];
@@ -75,3 +99,7 @@ group
     };
   })
   .attr("opacity", 1);
+
+}).catch((error) => {
+    console.log(error);
+});

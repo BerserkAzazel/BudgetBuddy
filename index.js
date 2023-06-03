@@ -55,6 +55,10 @@ app.get('/user', isAuthenticated, function (req, res) {
 app.get('/app', isAuthenticated, function (req, res) {
     res.sendFile(join(publicDirPath, 'dataviz.html'));
 });
+
+app.get('/chat', isAuthenticated, function (req, res) {
+    res.sendFile(join(publicDirPath, 'chat.html'));
+});
 // ...
 
 

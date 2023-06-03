@@ -5,265 +5,270 @@ import nodemailer from "nodemailer";
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
 const postActionInfo = asyncHandler(async (req, res) => {
-    const body = req?.body?.action;// action passed from frontend
-    const email = req?.body?.email;//email passed from frontend
-    if (body) {
-        const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${ body }\n\nCategory: \nMoney:`,
-            temperature: 0,
-            max_tokens: 64,
-            top_p: 1.0,
-            frequency_penalty: 0.0,
-            presence_penalty: 0.0,
-        });
-        const remain = response.data.choices[0].text.split("\n")[1];
-        const category = remain.split(", ")[0];
-        const money = remain.split(", ")[1];
+  const body = req?.body?.action; // action passed from frontend
+  const email = req?.body?.email; //email passed from frontend
+  if (body) {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${body}\n\nCategory: \nMoney:`,
+      temperature: 0,
+      max_tokens: 64,
+      top_p: 1.0,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.0,
+    });
+    const remain = response.data.choices[0].text.split("\n")[1];
+    const category = remain.split(", ")[0];
+    const money = remain.split("$")[1];
 
-
-        const user = await User.findOneAndUpdate({ email }, { $inc: { [category]: money } }, { new: true });
-        if (user) {
-            return res.status(200).json({ category, money })
-        }
-        return res.status(500).json({ message: "User not found" })
+    console.log(category, money);
+    const user = await User.findOneAndUpdate(
+      { email },
+      { $inc: { [category]: money } },
+      { new: true }
+    );
+    if (user) {
+      return res.status(200).json({ category, money });
     }
-    res.send("No action provided");
+    return res.status(500).json({ message: "User not found" });
+  }
+  res.send("No action provided");
 });
-
 
 let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e";
 
 // Requesting challenge
 const getChallenge = (req, res) => {
-    res.json({ challenge });
+  res.json({ challenge });
 };
 
 // Checking if user is registered
 const checkIsRegistered = asyncHandler(async (req, res) => {
-    const { username } = req.body;
+  const { username } = req.body;
 
-    try {
-        const user = await User.findOne({ username });
-        res.json({ isRegistered: !!user });
-    } catch (error) {
-        res.status(500).send({ message: error.message });
-    }
+  try {
+    const user = await User.findOne({ username });
+    res.json({ isRegistered: !!user });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 // Get User info
 const getUserInfo = asyncHandler(async (req, res) => {
-    const { credentialId } = req.body;
+  const { credentialId } = req.body;
 
-    try {
-        const user = await User.findOne({ credentialKeys: credentialId });
-        if (user) {
-            res.status(200).json({ user });
-        } else {
-            res.status(404).json({ message: "User not found" });
-        }
-    } catch (err) {
-        res.status(500).send({ message: err.message });
+  try {
+    const user = await User.findOne({ credentialKeys: credentialId });
+    if (user) {
+      res.status(200).json({ user });
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 });
 
 // Generate OTP
 function generateOTPcode() {
-    const digits = '0123456789';
-    let otp = '';
-    for (let i = 0; i < 6; i++) {
-        otp += digits[Math.floor(Math.random() * 10)];
-    }
-    return otp;
+  const digits = "0123456789";
+  let otp = "";
+  for (let i = 0; i < 6; i++) {
+    otp += digits[Math.floor(Math.random() * 10)];
+  }
+  return otp;
 }
 
 // Send OTP email
 async function sendOTPEmail(email, otp) {
-    try {
-        // Create a transporter using your email service provider credentials
-        let transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'alexandra.walter35@ethereal.email',
-                pass: 'hVBDmbkMfzs7es3rJf'
-            }
-        });
+  try {
+    // Create a transporter using your email service provider credentials
+    let transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      auth: {
+        user: "alexandra.walter35@ethereal.email",
+        pass: "hVBDmbkMfzs7es3rJf",
+      },
+    });
 
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: '"Alexandra Walter" <alexandra.walter35@ethereal.email>', // Replace with your email address
-            to: email,
-            subject: 'OTP Verification',
-            text: `Your OTP: ${ otp }`,
-            html: `<p>Your OTP: <strong>${ otp }</strong></p>`,
-        });
-        console.log('Email sent:', info.messageId);
-    } catch (error) {
-        console.error('Failed to send OTP email:', error);
-    }
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"Alexandra Walter" <alexandra.walter35@ethereal.email>', // Replace with your email address
+      to: email,
+      subject: "OTP Verification",
+      text: `Your OTP: ${otp}`,
+      html: `<p>Your OTP: <strong>${otp}</strong></p>`,
+    });
+    console.log("Email sent:", info.messageId);
+  } catch (error) {
+    console.error("Failed to send OTP email:", error);
+  }
 }
 
 //verify email otp
 const verifyOTP = asyncHandler(async (req, res) => {
-    const { username, otp } = req.body;
-    const storedOTP = req.session.otp;
+  const { username, otp } = req.body;
+  const storedOTP = req.session.otp;
 
-    if (storedOTP && storedOTP === otp) {
-        // OTP is correct
-        req.session.otp = null; // Clear the OTP from session after successful verification
+  if (storedOTP && storedOTP === otp) {
+    // OTP is correct
+    req.session.otp = null; // Clear the OTP from session after successful verification
 
-        // Perform additional actions here (e.g., update user data, grant access, etc.)
-        res.json({ success: true, message: 'OTP verification successful' });
-    } else {
-        // OTP is incorrect
-        res.status(401).json({ success: false, message: 'Invalid OTP' });
-    }
-})
+    // Perform additional actions here (e.g., update user data, grant access, etc.)
+    res.json({ success: true, message: "OTP verification successful" });
+  } else {
+    // OTP is incorrect
+    res.status(401).json({ success: false, message: "Invalid OTP" });
+  }
+});
 
 //generate otp
 const generateOTP = asyncHandler(async (req, res) => {
-    const { username } = req.body;
+  const { username } = req.body;
 
-    try {
-        const user = await User.findOne({ username });
-        if (user) {
-            const otp = generateOTPcode();
+  try {
+    const user = await User.findOne({ username });
+    if (user) {
+      const otp = generateOTPcode();
 
-            // Store the OTP in the session
-            req.session.otp = otp;
+      // Store the OTP in the session
+      req.session.otp = otp;
 
-            // Send OTP email
-            sendOTPEmail(user.email, otp);
+      // Send OTP email
+      sendOTPEmail(user.email, otp);
 
-            res.json({ message: 'OTP generated and email sent successfully' });
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        console.error('Failed to generate OTP:', error);
-        res.status(500).json({ message: 'Failed to generate OTP' });
+      res.json({ message: "OTP generated and email sent successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (error) {
+    console.error("Failed to generate OTP:", error);
+    res.status(500).json({ message: "Failed to generate OTP" });
+  }
 });
 
 // Registering new device for an existing user
 const register = asyncHandler(async (req, res) => {
-    const { username, verifyRegistrationData, otp } = req.body;
+  const { username, verifyRegistrationData, otp } = req.body;
 
-    try {
-        const user = await User.findOneAndUpdate(
-            { username },
-            {
-                $set: { verifyRegistrationData },
-                $push: { credentialKeys: verifyRegistrationData.credential.id },
-            },
-            { new: true }
-        );
+  try {
+    const user = await User.findOneAndUpdate(
+      { username },
+      {
+        $set: { verifyRegistrationData },
+        $push: { credentialKeys: verifyRegistrationData.credential.id },
+      },
+      { new: true }
+    );
 
-        if (user) {
-            req.session.isAuthenticated = true;
-            res.redirect("/user");
-        } else {
-            res.status(404).json({ message: "User not found" });
-        }
-    } catch (error) {
-        res.status(500).send({ message: error.message });
+    if (user) {
+      req.session.isAuthenticated = true;
+      res.redirect("/user");
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 // Verifying registration payload
 const verifyRegistrationPayload = asyncHandler(async (req, res) => {
-    const { registration } = req.body;
+  const { registration } = req.body;
 
-    try {
-        const registrationData = await server.verifyRegistration(registration, {
-            challenge,
-            origin: "http://localhost:5000",
-        });
-        res.json(registrationData);
-    } catch (error) {
-        res.status(500).send({ message: error.message });
-    }
+  try {
+    const registrationData = await server.verifyRegistration(registration, {
+      challenge,
+      origin: "http://localhost:5000",
+    });
+    res.json(registrationData);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 const verifyUserAuthentication = asyncHandler(async (req, res) => {
-    const { authentication } = req.body;
+  const { authentication } = req.body;
 
-    try {
-        const user = await User.findOne({ credentialKeys: authentication.credentialId });
+  try {
+    const user = await User.findOne({
+      credentialKeys: authentication.credentialId,
+    });
 
-        if (user) {
-            const credential = user.verifyRegistrationData.credential;
-            const expected = {
-                challenge: challenge,
-                origin: "http://localhost:5000",
-                userVerified: true,
-                counter: 0,
-            };
+    if (user) {
+      const credential = user.verifyRegistrationData.credential;
+      const expected = {
+        challenge: challenge,
+        origin: "http://localhost:5000",
+        userVerified: true,
+        counter: 0,
+      };
 
-            await server.verifyAuthentication(authentication, credential, expected);
-            req.session.isAuthenticated = true;
-            res.redirect("/user");
-        } else {
-            res.status(401).json({ message: "User not found" });
-        }
-    } catch (error) {
-        res.status(500).send({ message: error.message });
+      await server.verifyAuthentication(authentication, credential, expected);
+      req.session.isAuthenticated = true;
+      res.redirect("/user");
+    } else {
+      res.status(401).json({ message: "User not found" });
     }
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 // Register new users
 const registerNewUsers = asyncHandler(async (req, res) => {
-    const { username, email, verifyRegistrationData, name } = req.body;
+  const { username, email, verifyRegistrationData, name } = req.body;
 
-    try {
-        const userExist = await User.findOne({ email });
-        const usernameExist = await User.findOne({ username });
+  try {
+    const userExist = await User.findOne({ email });
+    const usernameExist = await User.findOne({ username });
 
-        if (userExist) {
-            return res.status(400).json({ message: "Email already exists" });
-        }
-        if (usernameExist) {
-            return res.status(400).json({ message: "Username already exists" });
-        }
-
-        const user = new User({
-            username,
-            email,
-            verifyRegistrationData,
-            name,
-            credentialKeys: [verifyRegistrationData.credential.id],
-        });
-
-        await user.save();
-        req.session.isAuthenticated = true;
-        res.redirect("/user");
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (userExist) {
+      return res.status(400).json({ message: "Email already exists" });
     }
+    if (usernameExist) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const user = new User({
+      username,
+      email,
+      verifyRegistrationData,
+      name,
+      credentialKeys: [verifyRegistrationData.credential.id],
+    });
+
+    await user.save();
+    req.session.isAuthenticated = true;
+    res.redirect("/user");
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // Logging out user
 const logoutUser = asyncHandler(async (req, res) => {
-    req.session = null;
-    res.redirect("/");
+  req.session = null;
+  res.redirect("/");
 });
 
 export {
-    getChallenge,
-    checkIsRegistered,
-    getUserInfo,
-    generateOTP,
-    verifyOTP,
-    register,
-    verifyRegistrationPayload,
-    verifyUserAuthentication,
-    registerNewUsers,
-    logoutUser,
-    postActionInfo,
+  getChallenge,
+  checkIsRegistered,
+  getUserInfo,
+  generateOTP,
+  verifyOTP,
+  register,
+  verifyRegistrationPayload,
+  verifyUserAuthentication,
+  registerNewUsers,
+  logoutUser,
+  postActionInfo,
 };
