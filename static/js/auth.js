@@ -56,12 +56,12 @@ const app = new Vue({
           // // this.registrationData = verifyRegistrationData
           window.localStorage.setItem("username", verifyRegistrationData.credential.id)
           // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
+          window.location.replace('/user');
 
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
           })
-          window.location.replace('/user');
         } else {
           //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
@@ -113,14 +113,11 @@ const app = new Vue({
           window.localStorage.setItem("username", verifyRegistrationData.credential.id)
           this.username = this.newusername
           // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
-
-
+          window.location.replace('/user');
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
           })
-          window.location.replace('/user');
-
         } else {
           //  // console.error('Registration failed:', response.statusText);
           this.isAuthenticated = false;
@@ -212,25 +209,9 @@ const app = new Vue({
         })
       }
     },
-    async getUserInfo(credentialId) {
-      const response = await fetch('/api/info', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          credentialId
-        }),
-      });
-      if (response.ok) {
-        const user = await response.json();
-        return user;
-      } else {
-        console.error(response.statusText)
-      }
-    },
   },
 
   async mounted() {
-    const auth = !!window.localStorage.getItem("username")
-    if (auth) window.location.replace('/user')
+    // if (this.isAuthenticated) window.location.replace('/app')
   },
 });

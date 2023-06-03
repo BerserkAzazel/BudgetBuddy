@@ -6,8 +6,8 @@ import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+});
+const openai = new OpenAIApi(configuration);
 
 let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e"
 // Custom challenge generation
@@ -109,9 +109,10 @@ const register = asyncHandler(async (req, res) => {
             );
 
             if (user) {
-                res.status(200);
+                req.session.isAuthenticated = true;
+                res.status(200).redirect('/user');
             } else {
-                res.status(500).send({ message: "User not found" });
+                res.status(500).json({ message: "User not found" });
             }
         } catch (error) {
             // console.error('Registration failed:', error);
@@ -155,9 +156,9 @@ const verifyUserAuthentication = asyncHandler(async (req, res) => {
             };
 
             await server.verifyAuthentication(authentication, credential, expected);
-
+            req.session.isAuthenticated = true;
             // Authentication successful
-            res.status(200).send({ message: "Authentication successful" });
+            res.status(200).json({ message: "Authentication successful" }).redirect('/user');
         } else {
             // User not found
             res.status(401).send({ message: "User not found" });
@@ -192,8 +193,8 @@ const registerNewUsers = asyncHandler(async (req, res) => {
         });
 
         await user.save(); // Save the user to the database
-
-        res.status(200).send({ message: "User registered successfully" });
+        req.session.isAuthenticated = true;
+        res.status(200).json({ message: "User registered successfully" }).redirect('/user');
     } catch (error) {
         // console.error('Registration failed:', error);
         return res.status(500).json({ message: error.message });
@@ -204,32 +205,43 @@ const registerNewUsers = asyncHandler(async (req, res) => {
 // Logging out user
 const logoutUser = asyncHandler(async (req, res) => {
     // Clear authentication state or session
-    res.status(200);
+    req.session = null;
+    res.status(200).redirect('/');
 });
 
 const postActionInfo = asyncHandler(async (req, res) => {
     const body = req?.body?.action;// action passed from frontend
     const email = req?.body?.email;//email passed from frontend
     if (body) {
-      const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: `The following is an action and the category its falls into among categories of [Investments, Savings, Income, Expenses] and the money mentioned in the action:\n\n${body}\n\ ${body}\nCategory:\nMoney:`,
-        temperature: 0,
-        max_tokens: 64,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-      });
-      const category = response.data.choices[0].text;
+        const response = await openai.createCompletion({
+            model: "text-davinci-003",
+            prompt: `The following is an action and the category its falls into among categories of [Investments, Savings, Income, Expenses] and the money mentioned in the action:\n\n${ body }\n\ ${ body }\nCategory:\nMoney:`,
+            temperature: 0,
+            max_tokens: 64,
+            top_p: 1.0,
+            frequency_penalty: 0.0,
+            presence_penalty: 0.0,
+        });
+        const category = response.data.choices[0].text;
         const money = response.data.choices[1].text;
-        
-        const user = await User.findOneAndUpdate({email}, {$set:{ [category]: money }},{new:true});
-        if(user){
-            return res.status(200).json({user})
+
+        const user = await User.findOneAndUpdate({ email }, { $set: { [category]: money } }, { new: true });
+        if (user) {
+            return res.status(200).json({ user })
         }
-        return res.status(500).json({message:"User not found"})
+        return res.status(500).json({ message: "User not found" })
     }
     res.send("No action provided");
 });
 
-export { getChallenge, checkIsRegistered, register, registerNewUsers, verifyRegistrationPayload, getUserInfo, verifyUserAuthentication, logoutUser, postActionInfo };
+export {
+    getChallenge,
+    checkIsRegistered,
+    register,
+    registerNewUsers,
+    verifyRegistrationPayload,
+    getUserInfo,
+    verifyUserAuthentication,
+    logoutUser,
+    postActionInfo
+};
