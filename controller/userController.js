@@ -29,7 +29,7 @@ const postActionInfo = asyncHandler(async (req, res) => {
 
         const user = await User.findOneAndUpdate({ email }, { $inc: { [category]: money } }, { new: true });
         if (user) {
-            return res.status(200).json({ user })
+            return res.status(200).json({ category, money })
         }
         return res.status(500).json({ message: "User not found" })
     }

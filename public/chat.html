@@ -13,6 +13,27 @@
     </form>
     <div id="chat-window"></div>
 
-    <script></script>
+    <script>
+      const chatWindow = document.getElementById("chat-window");
+      const userInput = document.getElementById("user-input");
+
+       async function askQuestion() {
+        const question = userInput.value;
+        userInput.value = "";
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {
+            "action": JSON.stringify("ask"),
+      }
+        });
+        const {answer} = await res.json();
+        const answerElement = document.createElement("div");
+        answerElement.innerText = `${answer}`;
+        chatWindow.appendChild(answerElement);
+      }
+    </script>
   </body>
 </html>
