@@ -99,8 +99,8 @@
                                         style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
                                         <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
                                             alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
-                                        <h5>{{user.name}}</h5>
-                                        <p><b>@</b>{{user.username}}</p>
+                                        <h5>{{user.res.user.name}}</h5>
+                                        <p><b>@</b>{{user.res.user.username}}</p>
                                         <i class="far fa-edit mb-5"></i>
                                     </div>
                                     <div class="col-md-8">
@@ -110,7 +110,7 @@
                                             <div class="row pt-1">
                                                 <div class="col-6 mb-3">
                                                     <h6>Email</h6>
-                                                    <p class="text-muted">{{user.email}}</p>
+                                                    <p class="text-muted">{{user.res.user.email}}</p>
                                                 </div>
 
                                             </div>
@@ -119,19 +119,19 @@
                                             <div class="row pt-1">
                                                 <div class="col-6 mb-3">
                                                     <h6>Income</h6>
-                                                    <p class="text-muted">{{user.Income}}</p>
+                                                    <p class="text-muted">{{user.res.user.Income}}</p>
                                                 </div>
                                                 <div class="col-6 mb-3">
                                                     <h6>Expenses</h6>
-                                                    <p class="text-muted">{{user.Expenses}}</p>
+                                                    <p class="text-muted">{{user.res.user.Expenses}}</p>
                                                 </div>
                                                 <div class="col-6 mb-3">
                                                     <h6>Investments</h6>
-                                                    <p class="text-muted">{{user.Investments}}</p>
+                                                    <p class="text-muted">{{user.res.user.Investments}}</p>
                                                 </div>
                                                 <div class="col-6 mb-3">
                                                     <h6>Savings</h6>
-                                                    <p class="text-muted">{{user.Savings}}</p>
+                                                    <p class="text-muted">{{user.res.user.Savings}}</p>
                                                 </div>
                                             </div>
                                             <div class="d-flex justify-content-start">
