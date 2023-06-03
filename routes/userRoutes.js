@@ -12,6 +12,7 @@ import {
     generateOTP,
     verifyOTP
 } from '../controller/userController.js';
+import isAuthenticated from "../middleware/authMiddleware.js"
 
 const userRoutes = express.Router();
 
@@ -47,7 +48,7 @@ userRoutes.post('/info', getUserInfo);
 
 
 //Post Action Info
-userRoutes.post('/chat', postActionInfo);
+userRoutes.post('/chat', isAuthenticated, postActionInfo);
 
 
 export { userRoutes };
