@@ -1,5 +1,3 @@
-import { client, parsers } from './webauthn.min.js';
-
 const app = new Vue({
     el: '#user',
     data: {
@@ -18,7 +16,7 @@ const app = new Vue({
                 });
                 if (response.ok) {
                     const res = await response.json();
-                    this.user = res;
+                    this.user = { res };
                     this.isAuthenticated = true;
                 } else {
                     console.error(response.statusText);
@@ -55,5 +53,6 @@ const app = new Vue({
         } catch (error) {
             console.error('Failed to fetch user info on mount:', error);
         }
+
     },
 });
