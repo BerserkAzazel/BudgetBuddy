@@ -44,6 +44,10 @@ app.get('/', function (req, res) {
 app.get('/user', function (req, res) {
     res.sendFile(join(publicDirPath, 'app.html'));
 });
+
+app.get('/app', function (req, res) {
+    res.sendFile(join(publicDirPath, 'dataviz.html'));
+});
 // ...
 
 
