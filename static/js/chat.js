@@ -4,7 +4,7 @@ new Vue({
     data() {
         return {
             question: '',
-            answers: ["lorem ipsum", "ipsum", "ipsum", "ipsum"]
+            answers: []
         };
     },
     methods: {
