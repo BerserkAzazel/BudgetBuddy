@@ -1831,9 +1831,8 @@ section {
     padding-top: 4px;
   }
 }
-
 #user-input {
-  width: 100%;
   border: none;
   outline: none;
+  width: 100%;
 }
