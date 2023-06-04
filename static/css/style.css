@@ -84,7 +84,7 @@ h6 {
   background: #47b2e4;
   width: 40px;
   height: 40px;
-  border-radius: 50px;
+  border-radius: 4px;
   transition: all 0.4s;
 }
 
@@ -192,7 +192,7 @@ h6 {
 .navbar .getstarted:focus {
   padding: 8px 20px;
   margin-left: 30px;
-  border-radius: 50px;
+  border-radius: 4px;
   color: #fff;
   font-size: 14px;
   border: 2px solid #47b2e4;
@@ -389,7 +389,7 @@ h6 {
 #hero {
   width: 100%;
   height: 80vh;
-  background: #37517e;
+  background: #3d4d6a;
 }
 
 #hero .container {
@@ -417,7 +417,7 @@ h6 {
   letter-spacing: 1px;
   display: inline-block;
   padding: 10px 28px 11px 28px;
-  border-radius: 50px;
+  border-radius: 4px;
   transition: 0.5s;
   margin: 10px 0 0 0;
   color: #fff;
@@ -911,7 +911,7 @@ section {
   letter-spacing: 1px;
   display: inline-block;
   padding: 12px 40px;
-  border-radius: 50px;
+  border-radius: 4px;
   transition: 0.5s;
   margin: 10px;
   border: 2px solid #fff;
@@ -955,7 +955,7 @@ section {
   color: #444444;
   transition: all 0.3s;
   padding: 8px 20px;
-  border-radius: 50px;
+  border-radius: 4px;
   font-family: "Poppins", sans-serif;
 }
 
@@ -1116,7 +1116,7 @@ section {
 
 .team .member .pic {
   overflow: hidden;
-  width: 180px;
+  width: 500px;
   border-radius: 50%;
 }
 
@@ -1175,7 +1175,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50px;
+  border-radius: 4px;
   width: 32px;
   height: 32px;
   background: #eff2f8;
@@ -1276,7 +1276,7 @@ section {
 .pricing .buy-btn {
   display: inline-block;
   padding: 12px 35px;
-  border-radius: 50px;
+  border-radius: 4px;
   color: #47b2e4;
   transition: none;
   font-size: 16px;
@@ -1430,7 +1430,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50px;
+  border-radius: 4px;
   transition: all 0.3s ease-in-out;
 }
 
@@ -1581,7 +1581,7 @@ section {
   padding: 12px 34px;
   color: #fff;
   transition: 0.4s;
-  border-radius: 50px;
+  border-radius: 4px;
 }
 
 .contact .php-email-form button[type="submit"]:hover {
@@ -1670,7 +1670,7 @@ section {
   background: #fff;
   padding: 6px 10px;
   position: relative;
-  border-radius: 50px;
+  border-radius: 4px;
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.06);
   text-align: left;
 }
@@ -1693,7 +1693,7 @@ section {
   background: #47b2e4;
   color: #fff;
   transition: 0.3s;
-  border-radius: 50px;
+  border-radius: 4px;
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -1835,4 +1835,8 @@ section {
   border: none;
   outline: none;
   width: 100%;
+}
+
+.why {
+  background-image: url(/img/why-us.png);
 }
