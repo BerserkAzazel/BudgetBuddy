@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-        <title>Inner Page - Budget Buddy Bootstrap Template</title>
+        <title>Budget Buddy</title>
         <meta content="" name="description">
         <meta content="" name="keywords">
 
@@ -31,13 +31,7 @@
         <!-- Template Main CSS File -->
         <link href="css/style.css" rel="stylesheet">
 
-        <!-- =======================================================
-  * Template Name: Budget Buddy
-  * Updated: May 30 2023 with Bootstrap v5.3.0
-  * Template URL: https://bootstrapmade.com/Budget Buddy-free-bootstrap-html-template-corporate/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+
         <style>
             main.container {
                 max-width: 640px !important;
@@ -55,17 +49,13 @@
 
                 <h1 class="logo me-auto"><a href="/">Budget Buddy</a></h1>
                 <!-- Uncomment below if you prefer to use an image logo -->
-                <!-- <a href="index.html" class="logo me-auto"><img src="img/logo.png" alt="" class="img-fluid"></a>-->
+                <!-- <a href="/" class="logo me-auto"><img src="img/logo.png" alt="" class="img-fluid"></a>-->
 
                 <nav id="navbar" class="navbar">
                     <ul>
-                        <li><a class="nav-link scrollto " href="#hero">Home</a></li>
-                        <li><a class="nav-link scrollto" href="#about">About</a></li>
-                        <li><a class="nav-link scrollto" href="#services">Services</a></li>
-                        <li><a class="nav-link   scrollto" href="#portfolio">Portfolio</a></li>
-                        <li><a class="nav-link scrollto" href="#team">Team</a></li>
-                        <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
-                        <li><a class="getstarted scrollto" href="#about">Get Started</a></li>
+
+                        <li><a class="nav-link scrollto" href="/app">Account Overview</a></li>
+                        <li><a class="getstarted scrollto" href="/chat">Add New Record</a></li>
                     </ul>
                     <i class="bi bi-list mobile-nav-toggle"></i>
                 </nav><!-- .navbar -->
@@ -95,7 +85,7 @@
                         <div class="col col-lg-10 mb-4 mb-lg-0">
                             <div class="card mb-3" style="border-radius: .5rem;">
                                 <div class="row g-0">
-                                    <div class="col-md-4 gradient-custom text-center text-white"
+                                    <div class="col-md-4 gradient-custom text-center"
                                         style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
                                         <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
                                             alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
@@ -108,11 +98,8 @@
                                             <h6>Information</h6>
                                             <hr class="mt-0 mb-4">
                                             <div class="row pt-1">
-                                                <div class="col-6 mb-3">
-                                                    <h6>Email</h6>
-                                                    <p class="text-muted">{{user.res.user.email}}</p>
-                                                </div>
-
+                                                <h6>Email</h6>
+                                                <p class="text-muted">{{user.res.user.email}}</p>
                                             </div>
                                             <h6>Account Overview</h6>
                                             <hr class="mt-0 mb-4">
@@ -134,7 +121,7 @@
                                                     <p class="text-muted">{{user.res.user.Savings}}</p>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-start">
+                                            <div class="d-flex justify-content-center">
                                                 <b-button type="is-primary" @click="logout()">Logout</b-button>
                                             </div>
                                         </div>
@@ -212,7 +199,7 @@
                     <!-- You can delete the links only if you purchased the pro version. -->
                     <!-- Licensing information: https://bootstrapmade.com/license/ -->
                     <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/Budget Buddy-free-bootstrap-html-template-corporate/ -->
-                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                    Made with Love
                 </div>
             </div>
         </footer><!-- End Footer -->

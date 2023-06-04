@@ -68,7 +68,7 @@ const app = new Vue({
           // // this.registrationData = verifyRegistrationData
           window.localStorage.setItem("username", verifyRegistrationData.credential.id)
           // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
-          window.location.replace('/user');
+          window.location.replace('/app');
 
           this.$buefy.toast.open({
             message: 'Registered!',
@@ -125,7 +125,7 @@ const app = new Vue({
           window.localStorage.setItem("username", verifyRegistrationData.credential.id)
           this.username = this.newusername
           // window.localStorage.setItem(// this.registrationData, verifyRegistrationData)
-          window.location.replace('/user');
+          window.location.replace('/app');
           this.$buefy.toast.open({
             message: 'Registered!',
             type: 'is-success'
@@ -201,7 +201,7 @@ const app = new Vue({
             type: 'is-success'
           })
           window.localStorage.setItem("username", authentication.credentialId)
-          window.location.replace('/user');
+          window.location.replace('/app');
         } else {
           // Authentication failed
           //  // console.error(`Authentication failed: ${ response.message }`);
@@ -274,6 +274,22 @@ const app = new Vue({
           this.errorMessage = 'Failed to verify OTP';
           console.error(error);
         });
+    },
+    async logout() {
+      try {
+        this.user = null;
+        this.isAuthenticated = false;
+        const response = await fetch('/api/logout', { method: 'POST' });
+        if (response.status === 200) {
+          window.localStorage.setItem("isAuth", false);
+          window.localStorage.removeItem('username');
+          window.location.replace('/');
+        } else {
+          console.error('Logout failed:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Failed to logout:', error);
+      }
     },
   },
 

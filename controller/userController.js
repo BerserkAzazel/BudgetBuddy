@@ -15,7 +15,7 @@ const postActionInfo = asyncHandler(async (req, res) => {
   if (body) {
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${body}\n\nCategory: \nMoney:`,
+      prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${ body }\n\nCategory: \nMoney:`,
       temperature: 0,
       max_tokens: 64,
       top_p: 1.0,
@@ -103,8 +103,8 @@ async function sendOTPEmail(email, otp) {
       from: '"Alexandra Walter" <alexandra.walter35@ethereal.email>', // Replace with your email address
       to: email,
       subject: "OTP Verification",
-      text: `Your OTP: ${otp}`,
-      html: `<p>Your OTP: <strong>${otp}</strong></p>`,
+      text: `Your OTP: ${ otp }`,
+      html: `<p>Your OTP: <strong>${ otp }</strong></p>`,
     });
     console.log("Email sent:", info.messageId);
   } catch (error) {

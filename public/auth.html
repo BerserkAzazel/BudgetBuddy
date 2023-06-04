@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Inner Page - Budget Buddy Bootstrap Template</title>
+    <title>Budget Buddy</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -31,13 +31,7 @@
     <!-- Template Main CSS File -->
     <link href="css/style.css" rel="stylesheet">
 
-    <!-- =======================================================
-  * Template Name: Budget Buddy
-  * Updated: May 30 2023 with Bootstrap v5.3.0
-  * Template URL: https://bootstrapmade.com/Budget Buddy-free-bootstrap-html-template-corporate/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+
     <style>
       main.container {
         max-width: 640px !important;
@@ -55,7 +49,7 @@
 
         <h1 class="logo me-auto"><a href="/">Budget Buddy</a></h1>
         <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="index.html" class="logo me-auto"><img src="img/logo.png" alt="" class="img-fluid"></a>-->
+        <!-- <a href="/" class="logo me-auto"><img src="img/logo.png" alt="" class="img-fluid"></a>-->
 
         <nav id="navbar" class="navbar">
           <ul>
@@ -145,6 +139,9 @@
         <br />
         <a class="text-primary" @click="gotoRegister()">Don't have an account? Register</a>
         </template>
+        <template v-if="isAuthenticated ">
+          <b-button type="is-primary" @click="logout()">Logout</b-button>
+        </template>
 
     </main>
     </div>
@@ -212,11 +209,8 @@
           &copy; Copyright <strong><span>Budget Buddy</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-          <!-- All the links in the footer should remain intact. -->
-          <!-- You can delete the links only if you purchased the pro version. -->
-          <!-- Licensing information: https://bootstrapmade.com/license/ -->
-          <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/Budget Buddy-free-bootstrap-html-template-corporate/ -->
-          Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+
+          Made with Love
         </div>
       </div>
     </footer><!-- End Footer -->
