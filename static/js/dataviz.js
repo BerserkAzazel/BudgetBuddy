@@ -1,7 +1,7 @@
-var innerRadius = [60, 100, 140, 180]; //adjust the inner and outer radius from here
-var outerRadius = [90, 130, 170, 210];
-var color = ["red", "green", "blue", "yellow"];//adjust colors from here
-var label = ["INVESTMENTS", "SAVINGS", "EXPENDITURE", "INCOME"] //add labels here
+var innerRadius = [40, 75, 110, 145]; // adjust the inner and outer radius from here
+var outerRadius = [70, 105, 140, 175];
+var color = ["#1F77B4", "#5199E4", "#78C2ED", "#A7DAF8"]; // adjust colors from here
+var label = ["INVESTMENTS", "SAVINGS", "EXPENDITURE", "INCOME"]; // add labels here
 
 const app = new Vue({
   el: "#app",
@@ -17,11 +17,14 @@ const app = new Vue({
         try {
           var sum = d3.sum(this.data);
 
+          var width = 400; // adjust the width of the SVG
+          var height = 400; // adjust the height of the SVG
+
           var svg = d3
             .select("#visualization")
             .append("svg")
-            .attr("width", 500)
-            .attr("height", 500);
+            .attr("viewBox", `0 0 ${ width } ${ height }`)
+            .attr("preserveAspectRatio", "xMidYMid meet");
 
           var arc = d3
             .arc()
@@ -40,7 +43,7 @@ const app = new Vue({
             .data(this.data)
             .enter()
             .append("g")
-            .attr("transform", "translate(250, 250)");//change height and width here too
+            .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
 
           group
             .append("text")
@@ -88,7 +91,7 @@ const app = new Vue({
             })
             .attr("opacity", 1);
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
       } else {
         console.log('User not authenticated');
@@ -96,7 +99,6 @@ const app = new Vue({
     } catch (error) {
       console.error('Failed to fetch user info on mount:', error);
     }
-
   },
   methods: {
     async getUserInfo(credentialId) {

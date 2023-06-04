@@ -29,7 +29,19 @@
 
         <!-- Template Main CSS File -->
         <link href="css/style.css" rel="stylesheet">
+        <style type="text/css">
+            #app {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
 
+            #visualization {
+                width: 380px;
+                height: 380px;
+            }
+
+        </style>
 
     </head>
 
@@ -70,8 +82,8 @@
             </section><!-- End Breadcrumbs -->
 
             <section class="inner-page">
-                <div class="container section">
-                    <div id="app" class="row d-flex justify-content-center align-items-center h-100">
+                <div class="container">
+                    <div id="app">
                         <div id="visualization">
                             <p class="h1" v-if="isNoRecordsFound">No records found</p>
                         </div>
