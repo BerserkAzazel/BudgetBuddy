@@ -96,7 +96,7 @@
                 <b-checkbox v-model="isNewRoaming">Use roaming authenticator (phone, usb key...)</b-checkbox>
               </b-field>
               <div>
-                <b-button type="is-primary" @click="register()" :disabled="!newusername">Register
+                <b-button type="is-info" @click="register()" :disabled="!newusername">Register
                   New User
                 </b-button>
               </div>
@@ -120,10 +120,10 @@
                   OTP</b-button>
               </b-field>
               <div>
-                <b-button type="is-primary" @click="registerNewDevice()" :disabled="!username || !otp"
+                <b-button type="is-info" @click="registerNewDevice()" :disabled="!username || !otp"
                   v-show="isRegisterNewDevice">Register
                   New Device</b-button>
-                <b-button type="is-primary" @click="login()" v-show="!isRegisterNewDevice"
+                <b-button type="is-info" @click="login()" v-show="!isRegisterNewDevice"
                   :disabled="!isRegistered || !username ">Authenticate</b-button>
               </div>
               <p v-if="errorMessage" class="m-2 alert alert-danger" role="alert">{{ errorMessage }}</p>
@@ -134,7 +134,7 @@
         <a class="text-primary" @click="gotoRegister()">Don't have an account? Register</a>
         </template>
         <template v-if="isAuthenticated ">
-          <b-button type="is-primary" @click="logout()">Logout</b-button>
+          <b-button type="is-info" @click="logout()">Logout</b-button>
         </template>
 
     </main>
