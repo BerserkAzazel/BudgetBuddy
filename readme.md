@@ -17,6 +17,9 @@ Welcome to BudgetBuddy, the all-in-one finance tracker application that helps yo
 - **Financial Reports**: Generate comprehensive reports to analyze your financial activities and make informed decisions.
 - **User-Friendly Interface**: Enjoy a visually appealing and user-friendly interface that makes managing your finances a breeze.
 
+## Demo
+
+
 ## Getting Started
 
 ### Prerequisites
