@@ -4,15 +4,17 @@ import { server } from "@passwordless-id/webauthn";
 import nodemailer from "nodemailer";
 import { Configuration, OpenAIApi } from "openai";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 const postActionInfo = asyncHandler(async (req, res) => {
   const body = req?.body?.action; // action passed from frontend
-  const email = req?.body?.email; //email passed from frontend
+  const username = req?.body?.username; //username passed from frontend
   if (body) {
+    const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY
+    });
+    const openai = new OpenAIApi(configuration);
+    try{
+      // console.log(configuration)
     const response = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${ body }\n\nCategory: \nMoney:`,
@@ -22,13 +24,13 @@ const postActionInfo = asyncHandler(async (req, res) => {
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
     });
+    // console.log(response.data.choices[0].text);
     const remain = response.data.choices[0].text.split("\n")[1];
     const category = remain.split(", ")[0];
     const money = remain.split("$")[1];
 
-    console.log(category, money);
     const user = await User.findOneAndUpdate(
-      { email },
+      { credentialKeys: username },
       { $inc: { [category]: money } },
       { new: true }
     );
@@ -37,7 +39,11 @@ const postActionInfo = asyncHandler(async (req, res) => {
     }
     return res.status(500).json({ message: "User not found" });
   }
-  res.send("No action provided");
+  catch(e){
+    console.log(e)
+  }
+  }
+  return res.json("No action provided");
 });
 
 let challenge = "a7c61ef9-dc23-4806-b486-2428938a547e";

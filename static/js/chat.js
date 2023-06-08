@@ -14,9 +14,10 @@ new Vue({
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ action: this.question }),
+                body: JSON.stringify({ action: this.question, username: window.localStorage.getItem('username') }),
             });
             const { answer } = await res.json();
+            // console.log(answer)
             this.answers.push(answer);
             this.question = '';
         }
