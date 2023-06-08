@@ -8,6 +8,7 @@ const app = new Vue({
   data: {
     data: [],
     isNoRecordsFound: false,
+    records: [],
   },
   async mounted() {
     try {
@@ -115,7 +116,7 @@ const app = new Vue({
           const user = res.user;
 
           this.data = [user.Investments, user.Savings, user.Expenses, user.Income];
-
+          this.records = user.records
           if (user.Investments === 0 && user.Savings === 0 && user.Expenses === 0 && user.Income == 0) {
             this.isNoRecordsFound = true;
             return; // Exit the function

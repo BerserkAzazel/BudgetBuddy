@@ -16,24 +16,25 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
-        Investments:{
+        Investments: {
             type: Number,
             default: 0,
         },
-        Savings:{
+        Savings: {
             type: Number,
             default: 0,
         },
-        Income:{
+        Income: {
             type: Number,
             default: 0,
         },
-        Expenses:{
+        Expenses: {
             type: Number,
             default: 0,
         },
         verifyRegistrationData: { type: mongoose.Schema.Types.Mixed },
         credentialKeys: [{ type: String }],
+        records: [{ type: String }]
     },
     { timestaps: true }
 );

@@ -16,10 +16,22 @@ new Vue({
                 },
                 body: JSON.stringify({ action: this.question, username: window.localStorage.getItem('username') }),
             });
+            if (res.ok) {
+                this.$buefy.toast.open({
+                    message: 'New Record Added',
+                    type: 'is-success'
+                })
+            } else {
+                this.$buefy.toast.open({
+                    message: 'Error: Could not add new Record',
+                    type: 'is-danger'
+                })
+            }
             const { answer } = await res.json();
             // console.log(answer)
             this.answers.push(answer);
             this.question = '';
+
         }
     }
 });
