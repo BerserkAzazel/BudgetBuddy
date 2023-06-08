@@ -10,38 +10,39 @@ const postActionInfo = asyncHandler(async (req, res) => {
   const username = req?.body?.username; //username passed from frontend
   if (body) {
     const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY
+      apiKey: process.env.OPENAI_API_KEY
     });
     const openai = new OpenAIApi(configuration);
-    try{
+    try {
       // console.log(configuration)
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${ body }\n\nCategory: \nMoney:`,
-      temperature: 0,
-      max_tokens: 64,
-      top_p: 1.0,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.0,
-    });
-    // console.log(response.data.choices[0].text);
-    const remain = response.data.choices[0].text.split("\n")[1];
-    const category = remain.split(", ")[0];
-    const money = remain.split("$")[1];
+      const response = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `The following is an action. Return both the category the action falls into among categories of [Investments, Savings, Income, Expenses] and the money:${ body }\n\nCategory: \nMoney:`,
+        temperature: 0,
+        max_tokens: 64,
+        top_p: 1.0,
+        frequency_penalty: 0.0,
+        presence_penalty: 0.0,
+      });
+      // console.log(response.data.choices[0].text);
+      const remain = response.data.choices[0].text.split("\n")[1];
+      const category = remain.split(", ")[0];
+      const money = remain.split("$")[1];
 
-    const user = await User.findOneAndUpdate(
-      { credentialKeys: username },
-      { $inc: { [category]: money } },
-      { new: true }
-    );
-    if (user) {
-      return res.status(200).json({ category, money });
+      const user = await User.findOneAndUpdate(
+        { credentialKeys: username },
+        { $inc: { [category]: money } },
+        { $push: { records: body } },
+        { new: true, upsert: true }
+      );
+      if (user) {
+        return res.status(200).json({ category, money });
+      }
+      return res.status(500).json({ message: "User not found" });
     }
-    return res.status(500).json({ message: "User not found" });
-  }
-  catch(e){
-    console.log(e)
-  }
+    catch (e) {
+      console.log(e)
+    }
   }
   return res.json("No action provided");
 });
